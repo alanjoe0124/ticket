@@ -1,0 +1,20 @@
+.container{width:100%;height:100%; overflow:auto;} 
+h1{display: inline;}
+h4{display: inline;}
+a{text-decoration:none}
+
+.headbox{width:100%;height:10%;float:left;}
+.head-main-box{width:61%;height:100%;float:left;text-align: left;margin: 2px;}
+.head-side-box{width:19%;height:100%;float:left;margin: 2px;}
+
+.mainbox{width:61%;height:100%;text-align: center;float:left;margin: 2px;margin-top: 14px;}
+.sidebox{width:19%;height:100%;text-align: center;float:left;margin: 2px;margin-top: 14px;}
+
+.row-title{width:100%;height:50px;margin-top:14px; float:left;}
+.row-text{width:100%;height:250px;margin-top:14px; float:left;}
+.row-content{width:100%;margin-top:14px; float:left;over-flow:auto;text-align: left;}
+.row-title-leftAlign{text-align: left;}
+.row-manage-title{width:50%;height:50px; float:left;text-align: left;}
+.row-manage-status{width:50%;height:50px; float:left;text-align: left;}
+.head-search{width:15%;float:left;}
+.head-title{width:80%;float:left;}
