@@ -52,13 +52,16 @@ if (!isset($_SESSION['cusomterEmail'])) {
                 $stmt->execute(array($email));
                 $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($ticketRows) {
-                    foreach ($ticketRows as $ticketRow) {         
+                    foreach ($ticketRows as $ticketRow) {
+                        if (mb_strlen($ticketRow['title'], 'UTF-8') > 20) {
+                            $ticketRow['title'] = substr($ticketRow['title'], 0, 20) . "...";
+                        }
                         echo '<div class="row-title">
                                         <div class="row-manage-title">
                                             <a href="/ticket_detail.php?ticket=' . $ticketRow['id'] . '">' . htmlspecialchars($ticketRow['title']) . '</a>
                                         </div>
                                         <div class="row-manage-status">
-                                            <p>'.$ticketRow['status'].'</p> 
+                                            ' . $ticketRow['status'] . '
                                         </div>
                               </div>';
                     }
