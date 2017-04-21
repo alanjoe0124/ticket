@@ -8,8 +8,6 @@ if (!isset($_SESSION['uid'])) {
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="/../common/css/main.css">
-        <script   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
     </head>
     <body>
         <div class="container">
@@ -32,22 +30,39 @@ if (!isset($_SESSION['uid'])) {
             <div class="mainbox">
                 <?php
                 require_once __DIR__ . '/../db.php';
-                $sql = "SELECT ticket.id AS id, title, status.name AS status, email, http_referer, time FROM ticket JOIN status ON ticket.status = status.id WHERE status = 1 ORDER BY time ASC";
-                $stmt = $db->prepare($sql);
-                $stmt->execute();
+                $sql = "SELECT  ticket.id AS id,
+                                ticket.title, 
+                                status.name AS status, 
+                                ticket.user as customer, 
+                                ticket.http_referer, 
+                                ticket.time 
+                        FROM    ticket 
+                                INNER JOIN status ON ticket.status = status.id 
+                        WHERE 
+                                status = 1    
+                                ORDER BY time ASC";  // ticket status ( 1 => pending, 2 => close ) 
+                $stmt = $db->query($sql); 
                 $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($ticketRows) {
-                    echo '<table><tr><th>title</th><th>customer</th><th>status</th><th>time</th><th>httpreferer</th></tr>';
+                    echo '<table>
+                            <tr>
+                                <th>title</th>
+                                <th>customer</th>
+                                <th>status</th>
+                                <th>time</th>
+                                <th>httpreferer</th>
+                            </tr>';
                     foreach ($ticketRows as $ticketRow) {
                         if (mb_strlen($ticketRow['title'], 'UTF-8') > 20) {
-                            $ticketRow['title'] = substr($ticketRow['title'], 0, 20) . "...";
+                            $ticketRow['title'] = mb_substr($ticketRow['title'], 0, 20, 'UTF-8')."...";
                         }
                         echo '<tr>
-                                  <td><a href = "/ticket_detail.php?ticket=' . $ticketRow['id'] . '">' . htmlspecialchars($ticketRow['title']) . '</a></td>
-                                  <td>' . htmlspecialchars($ticketRow['email']) . '</td>
-                                  <td>' . $ticketRow['status'] . '</td>
-                                  <td>' . $ticketRow['time'] . '</td>
-                                  <td>' . $ticketRow['http_referer'] . '</td>
+                                  <td><a href = "/admin/ticket_answer.php?ticket='.$ticketRow['id'].'">'
+                                       .htmlspecialchars($ticketRow['title']).'</a></td>
+                                  <td>'.htmlspecialchars($ticketRow['customer']).'</td>
+                                  <td>'.$ticketRow['status'].'</td>
+                                  <td>'.$ticketRow['time'].'</td>
+                                  <td>'.$ticketRow['http_referer'].'</td>
                               </tr>';
                     }
                     echo "</table>";
