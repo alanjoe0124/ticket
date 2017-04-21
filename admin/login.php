@@ -3,40 +3,48 @@ session_start();
 if (isset($_SESSION['uid'])) {
     header("Location:/admin/ticket_manage.php");
     exit;
+};
+if (isset($_SESSION['customerEmail'])){
+    $customerEmail = $_SESSION['customerEmail'];
+    header("Location:/index.php?email=$customerEmail");
+    exit;
 }
 if ($_POST) {
     try {
         require_once __DIR__. '/../prevent_csrf.php';
-        if (!isset($_POST['userName'])) {
-            throw new InvalidArgumentException("User name invalid");
+        $paramArr = array('userName', 'pwd');
+        foreach($paramArr as $param){
+            if(!isset($_POST[$param])){
+                throw new InvalidArgumentException("Missing required $param");
+            }
         }
-        if (!isset($_POST['pwd'])) {
-            throw new InvalidArgumentException("Password invalid");
+        $_POST['userName']=trim($_POST['userName']);
+        $userNameLength = mb_strlen($_POST['userName'], 'UTF-8');
+        if ( $userNameLength > 50 || $userNameLength < 3 ) {
+            throw new InvalidArgumentException("User name max length 50, min length 3");
         }
-        if (mb_strlen($_POST['userName'],'UTF-8') > 50) {
-            throw new InvalidArgumentException("User name max length 50");
-        }
-        if (strlen($_POST['pwd']) > 40) {
-            throw new InvalidArgumentException("Password max length 40");
+        $pwdLength = strlen($_POST['pwd']);
+        if ($pwdLength > 40 || $pwdLength < 5 ) {
+            throw new InvalidArgumentException("Password max length 40, min length 5");
         }
     } catch (Exception $e) {
         exit("Param error!");
     }
     require_once __DIR__ . '/../db.php';
-    $sql = "SELECT * FROM user WHERE name = ? and pwd = ?";
+    $sql = "SELECT id, name FROM user WHERE name = ? and pwd = ?";
     $stmt = $db->prepare($sql);
     $salt = 'acd806b0-d563-4824-907f-852f8f1003a5'; 
     $stmt->execute(array($_POST['userName'], md5($_POST['pwd'].$salt)));
     $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($userRow) {
+    if ($userRow) {   
         session_regenerate_id();
         $_SESSION['uid'] = $userRow['id'];
         $_SESSION['userName'] = $userRow['name'];
         header("Location:/admin/ticket_manage.php");
-        exit();
+        exit;
     } else {
         header("Location:/admin/login.php?error=password_failed");
-        exit();
+        exit;
     }
 }
 ?>
