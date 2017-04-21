@@ -1,11 +1,11 @@
 <?php
 session_start();
-if (!isset($_SESSION['customerEmail'])) {
+if (!isset($_SESSION['uid'])) {
     throw new InvalidArgumentException("Permission denied");
 }
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../db.php';
 if ($_POST) {
-    require_once __DIR__ . '/prevent_csrf.php';
+    require_once __DIR__ . '/../prevent_csrf.php';
     try {
         $formParam = array('comment', 'ticketId');
         foreach ($formParam as $key) {
@@ -26,15 +26,10 @@ if ($_POST) {
     } catch (Exception $e) {
         exit('Form Param error');
     }
-    $sql = "SELECT id FROM user WHERE name = ?";
-    $stmt = $db->prepare($sql);
-    $stmt->execute(array($_SESSION['customerEmail']));
-    $userId = $stmt->fetchColumn();
-
     $sql = "INSERT INTO comment (content, user, ticket_id) VALUES (?, ?, ?)";
     $stmt = $db->prepare($sql);
-    $stmt->execute(array($_POST['comment'], $userId, $ticketId));
-    header("Location:/ticket_ask.php?ticket=$ticketId");
+    $stmt->execute(array($_POST['comment'], $_SESSION['uid'], $ticketId));
+    header("Location:/admin/ticket_answer.php?ticket=$ticketId");
     exit();
 }
 
@@ -66,10 +61,9 @@ try {
                     <div class="head-title">
                         <p>    
                             <?php
-                            $customerEmail = $_SESSION['customerEmail'];
-                            echo '<a href="/index.php?email='.$customerEmail.'"><h1>Ticket</h1></a>
-                                  <p>user:' . $_SESSION['customerEmail'] . '&nbsp;/&nbsp;
-                                   <a href="/customer_logout.php">logout</a></p>';
+                            echo '<a href="/admin/ticket_manage.php"><h1>Ticket</h1></a>
+                                  <p>user:' . $_SESSION['userName'] . '&nbsp;/&nbsp;
+                                   <a href="/admin/logout.php">logout</a></p>';
                             ?> 
                     </div>
                     <HR width="100%">
@@ -96,13 +90,7 @@ try {
                 $stmt->execute(array($ticketId));
                 $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($ticketRow) {
-                    echo '<div>ticket info:';
-                    if ($ticketRow['status'] == "pending") {
-                         echo '<a href="/status_change.php?ticket=' . $ticketId . '&action=close"><button>close</button></a>';                        
-                    } else {
-                         echo '<a href="/status_change.php?ticket=' . $ticketId . '&action=reactivate"><button>reactivate</button></a>';              
-                    }
-                    echo '</div><HR width="100%">';
+                    echo '<div>ticket info:</div><HR width="100%">';
                     echo '<div>
                             <table>
                                 <tr>
@@ -122,5 +110,5 @@ try {
                             </table>
                          </div>';
                 }
-require_once __DIR__ . '/common/ticket_info_common.php';
+require_once __DIR__ . '/../common/ticket_info_common.php';
 
