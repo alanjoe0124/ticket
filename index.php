@@ -1,7 +1,7 @@
 <?php
 try {
     if (!isset($_GET['email'])) {
-        throw new InvalidArgumentException('Email invalid');
+        throw new InvalidArgumentException('Missing required email');
     }
     $emailLength = strlen($_GET['email']);
     if ($emailLength > 100 || $emailLength < 4) {
@@ -23,7 +23,7 @@ $stmt = $db->prepare("SELECT id FROM user WHERE name = ?");
 $stmt->execute(array($email));
 $userId = $stmt->fetchColumn();
 if (!$userId) {
-    exit("User doesn't exist");
+    exit("You have no ticket");
 }
 if (!isset($_SESSION['customerEmail'])) {
     session_regenerate_id();
@@ -43,9 +43,7 @@ if (!isset($_SESSION['customerEmail'])) {
                 <div class="head-main-box">
                     <div class="head-title">
                         <p><h1>Ticket</h1>
-                        <?php
-                        echo '<p>' . $_SESSION['customerEmail'] . '&nbsp;&nbsp;/<a href="/customer_logout.php">logout</a></p>';
-                        ?>
+                        <p> <?php echo htmlspecialchars($_SESSION['customerEmail']); ?>/<a href="/customer_logout.php">logout</a></p>
                     </div>
                     <HR width="100%">
                 </div>
@@ -62,25 +60,23 @@ if (!isset($_SESSION['customerEmail'])) {
                                status.name as status 
                         FROM   ticket 
                                INNER JOIN  status ON ticket.status = status.id 
-                        WHERE user = ?";
-                $stmt = $db->prepare($sql);
-                $stmt->execute(array($userId));
+                        WHERE user = $userId";
+                $stmt = $db->query($sql);
                 $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                if ($ticketRows) {
-                    foreach ($ticketRows as $ticketRow) {
-                        if (mb_strlen($ticketRow['title'], 'UTF-8') > 20) {
-                            $ticketRow['title'] = mb_substr($ticketRow['title'], 0, 20, 'UFT-8') . "...";
-                        }
-                        echo '<div class="row-title">
-                                        <div class="row-manage-title">
-                                            <a href="/ticket_ask.php?ticket=' . $ticketRow['id'] . '">' . htmlspecialchars($ticketRow['title']) . '</a>
-                                        </div>
-                                        <div class="row-manage-status">
-                                            ' . $ticketRow['status'] . '
-                                        </div>
-                              </div>';
-                    }
-                }
+                if ($ticketRows):
+                    foreach ($ticketRows as $row):
+                ?>
+                        <div class="row-title">
+                            <div class="row-manage-title">
+                                <a href="/ticket_ask.php?ticket=<?php echo $row['id']; ?>"> <?php echo htmlspecialchars($row['title']); ?> </a>
+                            </div>
+                            <div class="row-manage-status">
+                                <?php echo $row['status']; ?>
+                            </div>
+                        </div>
+                <?php
+                    endforeach;
+                endif;
                 ?>
             </div>
             <div class="sidebox"></div>
