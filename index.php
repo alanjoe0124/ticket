@@ -9,13 +9,23 @@ try {
     }
     $email = filter_var($_GET['email'], FILTER_VALIDATE_EMAIL);
     if (!$email) {
-        throw new InvalidArgumentException("Email format wrong!");
+        throw new InvalidArgumentException("Email invalid");
     }
 } catch (Exception $e) {
     exit("Param error");
 }
+require_once __DIR__ . '/db.php';
 session_start();
-if (!isset($_SESSION['cusomterEmail'])) {
+if (isset($_SESSION['uid'])) {
+    exit("Permission denied");
+}
+$stmt = $db->prepare("SELECT id FROM user WHERE name = ?");
+$stmt->execute(array($email));
+$userId = $stmt->fetchColumn();
+if (!$userId) {
+    exit("User doesn't exist");
+}
+if (!isset($_SESSION['customerEmail'])) {
     session_regenerate_id();
     $_SESSION['customerEmail'] = $email;
 }
@@ -24,8 +34,6 @@ if (!isset($_SESSION['cusomterEmail'])) {
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="/common/css/main.css">
-        <script   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
     </head>
     <body>
         <div class="container">
@@ -35,6 +43,9 @@ if (!isset($_SESSION['cusomterEmail'])) {
                 <div class="head-main-box">
                     <div class="head-title">
                         <p><h1>Ticket</h1>
+                        <?php
+                        echo '<p>' . $_SESSION['customerEmail'] . '&nbsp;&nbsp;/<a href="/customer_logout.php">logout</a></p>';
+                        ?>
                     </div>
                     <HR width="100%">
                 </div>
@@ -46,19 +57,23 @@ if (!isset($_SESSION['cusomterEmail'])) {
             <div class="sidebox"> </div>
             <div class="mainbox">
                 <?php
-                require_once __DIR__ . '/db.php';
-                $sql = "SELECT ticket.id as id,title,status.name as status FROM ticket JOIN status ON ticket.status = status.id WHERE email = ?";
+                $sql = "SELECT ticket.id,
+                               ticket.title, 
+                               status.name as status 
+                        FROM   ticket 
+                               INNER JOIN  status ON ticket.status = status.id 
+                        WHERE user = ?";
                 $stmt = $db->prepare($sql);
-                $stmt->execute(array($email));
+                $stmt->execute(array($userId));
                 $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($ticketRows) {
                     foreach ($ticketRows as $ticketRow) {
                         if (mb_strlen($ticketRow['title'], 'UTF-8') > 20) {
-                            $ticketRow['title'] = substr($ticketRow['title'], 0, 20) . "...";
+                            $ticketRow['title'] = mb_substr($ticketRow['title'], 0, 20, 'UFT-8') . "...";
                         }
                         echo '<div class="row-title">
                                         <div class="row-manage-title">
-                                            <a href="/ticket_detail.php?ticket=' . $ticketRow['id'] . '">' . htmlspecialchars($ticketRow['title']) . '</a>
+                                            <a href="/ticket_ask.php?ticket=' . $ticketRow['id'] . '">' . htmlspecialchars($ticketRow['title']) . '</a>
                                         </div>
                                         <div class="row-manage-status">
                                             ' . $ticketRow['status'] . '
