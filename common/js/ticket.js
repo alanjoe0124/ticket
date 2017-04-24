@@ -18,10 +18,12 @@ function create_ticket() {
 
 function submit_ticket() {
     $(".ticket_form").submit(function (event) {
-        alert('send successfully');
         var title = $('input[name=ticket_title]').val(), description = $('#descprition').val(), email = $('#email').text();
-        $.post("http://ticket.dev/ticket_create.php", {title: title, description: description, email: email});
-        event.preventDefault();
+        $.post("http://ticket.dev/ticket_create.php", 
+                {title: title, description: description, email: email, domain:location.host}, 
+                function(){ alert('send successfully')}
+                );
+        event.preventDefault();  
     });
 }
 

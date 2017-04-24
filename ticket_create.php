@@ -1,9 +1,9 @@
 <?php
-
-header('Access-Control-Allow-Origin:http://ourblog.dev');
 require_once __DIR__.'/prevent_csrf.php';
+header('Access-Control-Allow-Origin:http://ourblog.dev');
+
 try {
-    $paramArr = array('title', 'description', 'email');
+    $paramArr = array('title', 'description', 'email', 'domain');
     foreach ($paramArr as $param) {
         if (!isset($_POST[$param])) {
             throw new InvalidArgumentException("Required $param is missing");
@@ -23,6 +23,9 @@ try {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     if (!$email) {
         throw new InvalidArgumentException("Email invalid");
+    } 
+    if($_POST['domain'] != "ourblog.dev"){
+        throw new InvalidArgumentException("Domain invalid");
     }
 } catch (Exception $e) {
     exit("Param error!");
@@ -35,11 +38,11 @@ $userId = $stmt->fetchColumn();
 if(!$userId){
     exit("Permission denied");
 }
-$sql = "INSERT INTO ticket(title, description, user, http_referer) VALUES(?, ?, ?, ?)";
+$sql = "INSERT INTO ticket(title, description, user, domain) VALUES(?, ?, ?, ?)";
 $stmt = $db->prepare($sql);
 $stmt->execute(array(
     $_POST['title'],
     $_POST['description'],
     $userId,
-    $_SERVER['HTTP_REFERER']
+    $_POST['domain']
 ));
