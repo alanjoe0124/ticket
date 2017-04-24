@@ -8,14 +8,8 @@ try {
     if(!isset($_GET['action'])){
         throw new InvalidArgumentException("Missing required action");
     }
-    if(strlen($_GET['action']) > 10){
-        throw new InvalidArgumentException("Action code max length 10");
-    }
-    if($_GET['action'] != 'close' && $_GET['action'] !='reactivate'){
-        throw new InvalidArgumentException("Undefined action");
-    }
     if (!isset($_GET['ticket'])) {
-        throw new InvalidArgumentException("Ticket invalid");
+        throw new InvalidArgumentException("Missing required ticket");
     }
     $ticketId = filter_var($_GET['ticket'], FILTER_VALIDATE_INT, array(
         'options' => array('min_range' => 1)
@@ -25,18 +19,23 @@ try {
 }
 
 require_once __DIR__ . '/db.php';
-$sql = "SELECT * FROM ticket WHERE email = ? AND id = ?";
+$sql = "SELECT ticket.status
+        FROM ticket 
+            INNER JOIN user ON ticket.user = user.id
+        WHERE 
+            user.name = ? AND ticket.id = ?";
 $stmt = $db->prepare($sql);
-$stmt->execute(array($_SESSION['customerEmail'], $ticketId));
-if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+$stmt->execute( array($_SESSION['customerEmail'], $ticketId) );
+$status = $stmt->fetchColumn();
+if (!$status) {
     exit('No authority to operate this ticket');
 }
-if($_GET['action'] == 'close'){
-    $status = 2;
+if ($_GET['action'] == 'close'){
+    $updateStatus = 2; // 2 => 'close'
 }else{
-    $status = 1;
+    $updateStatus = 1; // 1 => 'reactivate'
 }
-$sql = "UPDATE ticket SET status = ".$status." WHERE id = $ticketId";
-$stmt = $db->prepare($sql);
-$stmt->execute();
-header("Location:/ticket_detail.php?ticket=$ticketId");
+if($status != $updateStatus){
+    $sql = $db->exec("UPDATE ticket SET status = $updateStatus WHERE id = $ticketId");  
+}
+header("Location:/ticket_ask.php?ticket=$ticketId");
