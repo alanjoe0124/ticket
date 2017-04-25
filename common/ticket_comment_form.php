@@ -1,6 +1,6 @@
 <?php
 if (!isset($ticketId)) {
-    exit("Permission denied");
+    exit("Missing required ticket");
 }
 ?>
 <HR width="100%">
