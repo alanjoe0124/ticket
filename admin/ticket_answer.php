@@ -1,8 +1,5 @@
 <?php
 session_start();
-if (!isset($_SESSION['uid'])) {
-    throw new InvalidArgumentException("Permission denied");
-}
 require_once __DIR__ . '/../db.php';
 if ($_POST) {
     require_once __DIR__ . '/../prevent_csrf.php';
@@ -26,14 +23,17 @@ if ($_POST) {
     } catch (Exception $e) {
         exit('Form Param error');
     }
-    $sql = "INSERT INTO comment (content, user, ticket_id) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO comment (content, user, ticket_id, user_type) VALUES (?, ?, ?, ?)";
     $stmt = $db->prepare($sql);
-    $stmt->execute(array($_POST['comment'], $_SESSION['uid'], $ticketId));
+    $stmt->execute(array($_POST['comment'], $_SESSION['uid'], $ticketId, 2)); // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
     header("Location:/admin/ticket_answer.php?ticket=$ticketId");
-    exit();
+    exit;
 }
 
 try {
+    if (!isset($_SESSION['uid'])) {
+        throw new InvalidArgumentException("Permission denied");
+    }
     if (!isset($_GET['ticket'])) {
         throw new InvalidArgumentException("Missing required ticket id");
     }
@@ -58,13 +58,9 @@ try {
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <div class="head-title">
-                        <p>    
-                            <?php
-                            echo '<a href="/admin/ticket_manage.php"><h1>Ticket</h1></a>
-                                  <p>user:' . $_SESSION['userName'] . '&nbsp;/&nbsp;
-                                   <a href="/admin/logout.php">logout</a></p>';
-                            ?> 
+                    <div class="head-title">    
+                        <a href="/admin/ticket_manage.php"><h1>Ticket</h1></a>
+                        user:<?php echo $_SESSION['userName']; ?> / <a href="/admin/logout.php">logout</a></p>
                     </div>
                     <HR width="100%">
                 </div>
@@ -76,39 +72,12 @@ try {
             <div class="sidebox"> </div>
             <div class="mainbox">
                 <?php
-                $sql = "SELECT user.name AS user, 
-                               ticket.id AS id,
-                               ticket.title, 
-                               ticket.description, 
-                               ticket.time,
-                               status.name AS status
-                        FROM   user INNER JOIN ticket ON user.id = ticket.user
-                                      INNER JOIN status ON ticket.status = status.id 
-                        WHERE 
-                               ticket.id = ?";
-                $stmt = $db->prepare($sql);
-                $stmt->execute(array($ticketId));
-                $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($ticketRow) {
-                    echo '<div>ticket info:</div><HR width="100%">';
-                    echo '<div>
-                            <table>
-                                <tr>
-                                    <th>title</th>
-                                    <th>description</th>
-                                    <th>customer</th>
-                                    <th>status</th>
-                                    <th>time</th>
-                                </tr>
-                                <tr>
-                                    <td >' . htmlspecialchars($ticketRow['title']) . '</td>
-                                    <td>' . htmlspecialchars($ticketRow['description']) . '</td>
-                                    <td>' . htmlspecialchars($ticketRow['user']) . '</td>
-                                    <td>' . $ticketRow['status'] . '</td>
-                                    <td>' . $ticketRow['time'] . '</td>       
-                                </tr>
-                            </table>
-                         </div>';
-                }
-require_once __DIR__ . '/../common/ticket_info_common.php';
+                include __DIR__ . '/../common/ticket_info.php';
+                include __DIR__ . '/../common/ticket_comments.php';
+                include __DIR__ . '/../common/ticket_comment_form.php';
+                ?>
+            </div>
+    </body>
+</html>
+
 

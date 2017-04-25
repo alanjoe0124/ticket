@@ -1,8 +1,5 @@
 <?php
 session_start();
-if (!isset($_SESSION['customerEmail'])) {
-    throw new InvalidArgumentException("Permission denied");
-}
 require_once __DIR__ . '/db.php';
 if ($_POST) {
     require_once __DIR__ . '/prevent_csrf.php';
@@ -26,7 +23,7 @@ if ($_POST) {
     } catch (Exception $e) {
         exit('Form Param error');
     }
-    $sql = "SELECT id FROM user WHERE name = ?";
+    $sql = "SELECT id FROM customer WHERE name = ?";
     $stmt = $db->prepare($sql);
     $stmt->execute(array($_SESSION['customerEmail']));
     $userId = $stmt->fetchColumn();
@@ -39,6 +36,9 @@ if ($_POST) {
 }
 
 try {
+    if (!isset($_SESSION['customerEmail'])) {
+        throw new InvalidArgumentException("Permission denied");
+    }
     if (!isset($_GET['ticket'])) {
         throw new InvalidArgumentException("Missing required ticket id");
     }
@@ -63,14 +63,9 @@ try {
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <div class="head-title">
-                        <p>    
-                            <?php
-                            $customerEmail = $_SESSION['customerEmail'];
-                            echo '<a href="/index.php?email='.$customerEmail.'"><h1>Ticket</h1></a>
-                                  <p>user:' . $_SESSION['customerEmail'] . '&nbsp;/&nbsp;
-                                   <a href="/customer_logout.php">logout</a></p>';
-                            ?> 
+                    <div class="head-title"> 
+                        <a href="/index.php?email=<?php echo $_SESSION['customerEmail']; ?>"><h1>Ticket</h1></a>
+                        <p>user:<?php echo $_SESSION['customerEmail']; ?> / <a href="/customer_logout.php">logout</a></p>
                     </div>
                     <HR width="100%">
                 </div>
@@ -82,45 +77,10 @@ try {
             <div class="sidebox"> </div>
             <div class="mainbox">
                 <?php
-                $sql = "SELECT user.name AS user, 
-                               ticket.id AS id,
-                               ticket.title, 
-                               ticket.description, 
-                               ticket.time,
-                               status.name AS status
-                        FROM   user INNER JOIN ticket ON user.id = ticket.user
-                                      INNER JOIN status ON ticket.status = status.id 
-                        WHERE 
-                               ticket.id = ?";
-                $stmt = $db->prepare($sql);
-                $stmt->execute(array($ticketId));
-                $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($ticketRow) {
-                    echo '<div>ticket info:';
-                    if ($ticketRow['status'] == "pending") {
-                         echo '<a href="/status_change.php?ticket=' . $ticketId . '&action=close"><button>close</button></a>';                        
-                    } else {
-                         echo '<a href="/status_change.php?ticket=' . $ticketId . '&action=reactivate"><button>reactivate</button></a>';              
-                    }
-                    echo '</div><HR width="100%">';
-                    echo '<div>
-                            <table>
-                                <tr>
-                                    <th>title</th>
-                                    <th>description</th>
-                                    <th>customer</th>
-                                    <th>status</th>
-                                    <th>time</th>
-                                </tr>
-                                <tr>
-                                    <td >' . htmlspecialchars($ticketRow['title']) . '</td>
-                                    <td>' . htmlspecialchars($ticketRow['description']) . '</td>
-                                    <td>' . htmlspecialchars($ticketRow['user']) . '</td>
-                                    <td>' . $ticketRow['status'] . '</td>
-                                    <td>' . $ticketRow['time'] . '</td>       
-                                </tr>
-                            </table>
-                         </div>';
-                }
-require_once __DIR__ . '/common/ticket_info_common.php';
-
+                include __DIR__ . '/common/ticket_info.php';
+                include __DIR__ . '/common/ticket_comments.php';
+                include __DIR__ . '/common/ticket_comment_form.php';
+                ?>
+            </div>
+    </body>
+</html>
