@@ -1,6 +1,6 @@
 <?php
 if (!isset($ticketId)) {
-    exit("Permission denied");
+    exit("Missing required ticket");
 }
 
 $sql = "SELECT customer.name AS customer, 
@@ -15,31 +15,30 @@ $sql = "SELECT customer.name AS customer,
                                ticket.id = $ticketId";
 $stmt = $db->query($sql);
 $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
-if ($ticketRow) :
-    ?>
-    <div>ticket info:
-        <?php
-        include __DIR__. '/../close.php';
-        ?>
-    </div><HR width="100%">
-    <div>
-        <table>
-            <tr>
-                <th>title</th>
-                <th>description</th>
-                <th>customer</th>
-                <th>status</th>
-                <th>time</th>
-            </tr>
-            <tr>
-                <td><?php echo htmlspecialchars($ticketRow['title']); ?></td>
-                <td><?php echo htmlspecialchars($ticketRow['description']); ?></td>
-                <td><?php echo htmlspecialchars($ticketRow['customer']); ?></td>
-                <td><?php echo $ticketRow['status']; ?></td>
-                <td><?php echo $ticketRow['time']; ?></td>       
-            </tr>
-        </table>
-    </div>
-    <?php
-endif;
 ?>
+<div>ticket info:
+    <?php if (isset($_SESSION['customerEmail'])): ?>
+        <?php if ($ticketRow['status'] == "pending"): ?>
+            <a href="/close.php?ticket=<?php echo $ticketId; ?>"><button>close</button></a>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+<HR width="100%">
+<div>
+    <table>
+        <tr>
+            <th>title</th>
+            <th>description</th>
+            <th>customer</th>
+            <th>status</th>
+            <th>time</th>
+        </tr>
+        <tr>
+            <td><?php echo htmlspecialchars($ticketRow['title']); ?></td>
+            <td><?php echo htmlspecialchars($ticketRow['description']); ?></td>
+            <td><?php echo htmlspecialchars($ticketRow['customer']); ?></td>
+            <td><?php echo $ticketRow['status']; ?></td>
+            <td><?php echo $ticketRow['time']; ?></td>       
+        </tr>
+    </table>
+</div>
