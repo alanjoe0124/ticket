@@ -14,7 +14,8 @@ a{text-decoration:none}
 .row-text{width:100%;height:250px;margin-top:14px; float:left;}
 .row-content{width:100%;margin-top:14px; float:left;over-flow:auto;text-align: left;}
 .row-title-leftAlign{text-align: left;}
-.row-manage-title{width:50%;height:50px; float:left;text-align: left;}
+.row-manage-title{width:50%;height:50px; float:left;text-align: left;overflow: hidden;
+                   display: inline-block; text-overflow: ellipsis}
 .row-manage-status{width:50%;height:50px; float:left;text-align: left;}
 .head-search{width:15%;float:left;}
 .head-title{width:80%;float:left;}
