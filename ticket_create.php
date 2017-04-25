@@ -31,12 +31,15 @@ try {
     exit("Param error!");
 }
 require_once __DIR__ . '/db.php';
-$sql = "SELECT id FROM user WHERE name = ?";
+$sql = "SELECT id FROM customer WHERE name = ?";
 $stmt = $db->prepare($sql);
 $stmt->execute(array($email));
 $userId = $stmt->fetchColumn();
 if(!$userId){
-    exit("Permission denied");
+    $sql = "INSERT INTO customer( name ) VALUES( ? )";
+    $stmt = $db->prepare($sql);
+    $stmt->execute(array($email));
+    $userId = $db->lastInsertId();
 }
 $sql = "INSERT INTO ticket(title, description, user, domain) VALUES(?, ?, ?, ?)";
 $stmt = $db->prepare($sql);
