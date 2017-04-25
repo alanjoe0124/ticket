@@ -19,7 +19,7 @@ session_start();
 if (isset($_SESSION['uid'])) {
     exit("Permission denied");
 }
-$stmt = $db->prepare("SELECT id FROM user WHERE name = ?");
+$stmt = $db->prepare("SELECT id FROM customer WHERE name = ?");
 $stmt->execute(array($email));
 $userId = $stmt->fetchColumn();
 if (!$userId) {
