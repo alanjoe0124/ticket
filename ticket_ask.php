@@ -59,20 +59,10 @@ try {
     </head>
     <body>
         <div class="container">
-            <!--content_head start-->
-            <div class="headbox">
-                <div class="head-side-box"></div>
-                <div class="head-main-box">
-                    <div class="head-title"> 
-                        <a href="/index.php?email=<?php echo $_SESSION['customerEmail']; ?>"><h1>Ticket</h1></a>
-                        <p>user:<?php echo $_SESSION['customerEmail']; ?> / <a href="/customer_logout.php">logout</a></p>
-                    </div>
-                    <HR width="100%">
-                </div>
-                <div class="head-side-box"></div>
-            </div> 
+            <!--content_head start--> 
+            <?php include __DIR__ . '/head.php'; ?>
             <!--content_head end->
-            
+
             <!--contetn_body start-->
             <div class="sidebox"> </div>
             <div class="mainbox">
@@ -80,7 +70,5 @@ try {
                 include __DIR__ . '/common/ticket_info.php';
                 include __DIR__ . '/common/ticket_comments.php';
                 include __DIR__ . '/common/ticket_comment_form.php';
+                include __DIR__ . '/footer.php';
                 ?>
-            </div>
-    </body>
-</html>
