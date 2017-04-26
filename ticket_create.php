@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__.'/prevent_csrf.php';
+
+require_once __DIR__ . '/prevent_csrf.php';
 header('Access-Control-Allow-Origin:http://ourblog.dev');
 
 try {
@@ -23,30 +24,36 @@ try {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     if (!$email) {
         throw new InvalidArgumentException('Email invalid');
-    } 
-    if($_POST['domain'] != 'ourblog.dev'){
+    }
+    if ($_POST['domain'] != 'ourblog.dev') {
         throw new InvalidArgumentException('Domain invalid');
     }
 } catch (Exception $e) {
     exit('Param error!');
 }
 require_once __DIR__ . '/db.php';
-$sql = 'SELECT id FROM customer WHERE name = ?';
-$stmt = $db->prepare($sql);
-$stmt->execute(array($email));
-$userId = $stmt->fetchColumn();
-if(!$userId){
-    $sql = 'INSERT INTO customer( name ) VALUES( ? )';
+try {
+    $db->beginTransaction();
+    $sql = 'SELECT id FROM customer WHERE name = ?';
     $stmt = $db->prepare($sql);
     $stmt->execute(array($email));
-    $userId = $db->lastInsertId();
+    $userId = $stmt->fetchColumn();
+    if (!$userId) {
+        $sql = 'INSERT INTO customer( name ) VALUES( ? )';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($email));
+        $userId = $db->lastInsertId();
+    }
+    $sql = 'INSERT INTO ticket(title, description, user, domain) VALUES(?, ?, ?, ?)';
+    $stmt = $db->prepare($sql);
+    $stmt->execute(array(
+        $_POST['title'],
+        $_POST['description'],
+        $userId,
+        'ourblog.dev'
+    ));
+    $db->commit();
+    echo "success";
+} catch (Exception $e) {
+    $db->rollBack();
 }
-$sql = 'INSERT INTO ticket(title, description, user, domain) VALUES(?, ?, ?, ?)';
-$stmt = $db->prepare($sql);
-$stmt->execute(array(
-    $_POST['title'],
-    $_POST['description'],
-    $userId,
-    'ourblog.dev'
-));
-echo "success";
