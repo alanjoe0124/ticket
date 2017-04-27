@@ -7,9 +7,8 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Required title is missing
      */
     public function test_title_isset() {
-        if (!isset($title)) {
-            throw new InvalidArgumentException('Required title is missing');
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->title_isset();
     }
 
     /**
@@ -17,9 +16,8 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Required description is missing
      */
     public function test_description_isset() {
-        if (!isset($description)) {
-            throw new InvalidArgumentException("Required description is missing");
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->description_isset();
     }
 
     /**
@@ -27,9 +25,8 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Required email is missing
      */
     public function test_email_isset() {
-        if (!isset($description)) {
-            throw new InvalidArgumentException("Required email is missing");
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->email_isset();
     }
 
     /**
@@ -37,9 +34,8 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Required domain is missing
      */
     public function test_domain_isset() {
-        if (!isset($domain)) {
-            throw new InvalidArgumentException("Required domain is missing");
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->domain_isset();
     }
 
     public function titleProvider() {
@@ -59,13 +55,11 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @dataProvider titleProvider
      */
     public function test_title_length($title) {
-        $titleLength = mb_strlen($title, "utf-8");
-        if ($titleLength > 500 || $titleLength < 1) {
-            throw new InvalidArgumentException('Title max length 500, min length 1');
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->title_length($title);
     }
 
-    public function descpritionProvider() {
+    public function descLengthProvider() {
         $data = '';
         for ($i = 0; $i < 64001; $i++) {
             $data .= 'a';
@@ -78,15 +72,14 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Max description is 64000
-     * @dataProvider descpritionProvider
+     * @dataProvider descLengthProvider
      */
     public function test_description_length($description) {
-        if (strlen($description) > 64000) {
-            throw new InvalidArgumentException('Max description is 64000');
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->description_length($description);
     }
 
-    public function variableLengthEmailProvider() {
+    public function emailLengthProvider() {
         $data = '';
         for ($i = 0; $i < 101; $i++) {
             $data .= 'a';
@@ -100,13 +93,11 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Email min length 4, max length 100
-     * @dataProvider variableLengthEmailProvider
+     * @dataProvider emailLengthProvider
      */
     public function test_email_length($email) {
-        $emailLength = strlen($email);
-        if ($emailLength > 100 || $emailLength < 4) {
-            throw new InvalidArgumentException('Email min length 4, max length 100');
-        }
+        $ticketException = new TicketCreateException();
+        $ticketException->email_length($email);
     }
 
     public function invalidEmailProvider() {
@@ -121,28 +112,18 @@ class TicketCreateExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Email invalid
      * @dataProvider invalidEmailProvider
      */
-    public function test_email_format($email) {
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            throw new InvalidArgumentException('Email invalid');
-        }
+    public function test_email_invalid($email) {
+        $ticketException = new TicketCreateException();
+        $ticketException->email_invalid($email);
     }
-
-    public function domainProvider() {
-        return array(
-            array('ourblog.com')
-        );
-    }
-
+ 
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Domain invalid
-     * @dataProvider domainProvider
      */
-    public function test_domain($domain) {
-        if ($domain != 'ourblog.dev') {
-            throw new InvalidArgumentException('Domain invalid');
-        }
+    public function test_domain_invalid() {
+        $ticketException = new TicketCreateException();
+        $ticketException->domain_invalid('ourblog.com');
     }
 
 }

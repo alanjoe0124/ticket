@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ .'/../include/AutoLoad.php';
 
 class PreventCsrfExceptionTest extends PHPUnit_Framework_TestCase {
 
@@ -7,9 +8,8 @@ class PreventCsrfExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Missing HTTP REFERER
      */
     public function test_http_referer_isset() {
-        if (!isset($httpReferer)) {
-            throw new InvalidArgumentException('Missing HTTP REFERER');
-        }
+        $preventCsrfException = new PreventCsrfException();
+        $preventCsrfException->http_referer_isset();
     }
 
     /**
@@ -17,11 +17,8 @@ class PreventCsrfExceptionTest extends PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage SERVER_NAME and HTTP_REFERER mismatch
      */
     public function test_domain_name() {
-        $referer = preg_match('#^http://([^/]+)#', 'http://ourblog.de/index.php', $matches);
-        $domainName = $matches[1];
-        if ($domainName != 'ourblog.dev' && $domainName != 'ticket.dev') {
-            throw new InvalidArgumentException('SERVER_NAME and HTTP_REFERER mismatch');
-        }
+        $preventCsrfException = new PreventCsrfException();
+        $preventCsrfException->domain_name();
     }
 
 }
