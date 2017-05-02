@@ -1,16 +1,15 @@
 <?php
 
-class Ticket
-{
-    public function create(array $data)
-    {
+class Ticket {
+
+    public function create(array $data) {
         $paramArr = array('title', 'description', 'email', 'domain');
         foreach ($paramArr as $param) {
             if (!isset($data[$param])) {
                 throw new InvalidArgumentException("Required $param is missing");
             }
         }
-        
+
         $titleLength = mb_strlen($data['title'], "UTF-8");
         if ($titleLength > 500 || $titleLength < 1) {
             throw new InvalidArgumentException('Title max length 500, min length 1');
@@ -29,13 +28,13 @@ class Ticket
         if ($data['domain'] != 'ourblog.dev') {
             throw new InvalidArgumentException('Domain invalid');
         }
-        
+
         $db = Db::getDb();
-        
+
         $stmt = $db->prepare('SELECT id FROM customer WHERE name = ?');
         $stmt->execute(array($data['email']));
         $customerId = $stmt->fetchColumn();
-        
+
         $db->beginTransaction();
         try {
             if (!$customerId) {
@@ -56,4 +55,36 @@ class Ticket
             throw $e;
         }
     }
+
+    public function close(array $data) {
+        try {
+            if (!isset($data['customerEmail'])) {
+                throw new InvalidArgumentException('Missing required customerEmail');
+            }
+            if (!isset($data['ticket'])) {
+                throw new InvalidArgumentException('Missing required ticket');
+            }
+            $ticketId = filter_var($data['ticket'], FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1)
+            ));
+        } catch (Exception $e) {
+            throw $e;
+        }
+        $db = Db::getDb();
+        $sql = "SELECT ticket.status
+                FROM ticket 
+                    INNER JOIN customer ON ticket.user = customer.id
+                WHERE 
+                    customer.name = ? AND ticket.id = $ticketId";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($data['customerEmail']));
+        $status = $stmt->fetchColumn();
+        if (!$status) {
+            throw new InvalidArgumentException('Customer Email and ticket id not related');
+        }
+        if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
+            $sql = $db->exec("UPDATE ticket SET status = 2 WHERE id = $ticketId");
+        }
+    }
+
 }
