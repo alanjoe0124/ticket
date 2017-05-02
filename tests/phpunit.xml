@@ -1,0 +1,25 @@
+<phpunit
+    bootstrap="bootstrap.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnError="true"
+    stopOnFailure="true"
+    verbose="true">
+    
+    <testsuites>
+        <testsuite name="Ticket">
+            <directory suffix="Test.php">./Ticket</directory>
+        </testsuite>
+    </testsuites>
+    
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../lib</directory>
+        </whitelist>
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="./report"/>
+    </logging>
+</phpunit>
