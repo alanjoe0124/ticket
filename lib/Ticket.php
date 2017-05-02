@@ -87,4 +87,36 @@ class Ticket {
         }
     }
 
+    public function view($data) {
+        try {
+            if (!isset($data['email'])) {
+                throw new InvalidArgumentException('Missing required email');
+            }
+            $emailLength = strlen($data['email']);
+            if ($emailLength > 100 || $emailLength < 4) {
+                throw new InvalidArgumentException('Email min length 4, max length 100');
+            }
+            $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
+            if (!$email) {
+                throw new InvalidArgumentException('Email invalid');
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        $db = Db::getDb();
+        $stmt = $db->prepare('SELECT id FROM customer WHERE name = ?');
+        $stmt->execute(array($email));
+        $customerId = $stmt->fetchColumn();
+
+        $sql = "SELECT ticket.id,
+                               ticket.title, 
+                               status.name as status 
+                        FROM   ticket 
+                               INNER JOIN  status ON ticket.status = status.id 
+                        WHERE user = $customerId
+                        ORDER BY ticket.time DESC, ticket.id DESC";
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
