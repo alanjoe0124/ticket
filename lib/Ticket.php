@@ -221,4 +221,24 @@ class Ticket {
         return $userRow;
     }
 
+    public function manage() {
+        $sql = 'SELECT  status.name AS status,
+                                ticket.id AS id,
+                                ticket.title,
+                                ticket.user as customer, 
+                                ticket.domain,
+                                customer.name as customer
+                        FROM    ticket 
+                                INNER JOIN status ON status.id = ticket.status
+                                INNER JOIN customer ON ticket.user = customer.id
+                        WHERE 
+                                status = 1    
+                                ORDER BY time DESC, ticket.id DESC';  
+        // ticket status ( 1 => pending, 2 => close ) 
+        $db = Db::getDb();
+        $stmt = $db->query($sql);
+        $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $ticketRows;
+    }
+
 }
