@@ -233,12 +233,40 @@ class Ticket {
                                 INNER JOIN customer ON ticket.user = customer.id
                         WHERE 
                                 status = 1    
-                                ORDER BY time DESC, ticket.id DESC';  
+                                ORDER BY time DESC, ticket.id DESC';
         // ticket status ( 1 => pending, 2 => close ) 
         $db = Db::getDb();
         $stmt = $db->query($sql);
         $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $ticketRows;
+    }
+
+    public function answer(array $data) {
+        try {
+            $formParam = array('comment', 'ticketId');
+            foreach ($formParam as $key) {
+                if (!isset($data[$key])) {
+                    throw new InvalidArgumentException("Missing required $key");
+                }
+            }
+            $commentLength = strlen($data['comment']);
+            if ($commentLength > 64000 || $commentLength == 0) {
+                throw new InvalidArgumentException('Comment max length 64000 and not empty');
+            }
+            $ticketId = filter_var($data['ticketId'], FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1)
+            ));
+            if (!$ticketId) {
+                throw new InvalidArgumentException('Invalid ticket id');
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        $db = Db::getDb();
+        $sql = 'INSERT INTO comment (content, user, ticket_id, user_type) VALUES (?, ?, ?, ?)';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($data['comment'], $data['uid'], $ticketId, 2)); 
+        // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
     }
 
 }
