@@ -151,4 +151,33 @@ class Ticket {
         $stmt->execute(array($data['comment'], $userId, $ticketId));
     }
 
+    public function info(array $data) {
+        try {
+            if (!isset($data['customerEmail'])) {
+                throw new InvalidArgumentException('Missing required customer email');
+            }
+            $ticketId = filter_var($data['ticket'], FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1)
+            ));
+            if (!$ticketId) {
+                throw new InvalidArgumentException('Invalid ticket id');
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        $db = Db::getDb();
+        $sql = "SELECT customer.name AS customer,
+                        ticket.id AS id,
+                        ticket.title,
+                        ticket.description,
+                        status.name AS status
+                    FROM customer INNER JOIN ticket ON customer.id = ticket.user
+                        INNER JOIN status ON ticket.status = status.id
+                    WHERE
+                        ticket.id = $ticketId";
+        $stmt = $db->query($sql);
+        $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $ticketRow;
+    }
+
 }
