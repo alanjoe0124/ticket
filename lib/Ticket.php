@@ -87,7 +87,7 @@ class Ticket {
         }
     }
 
-    public function view($data) {
+    public function view(array $data) {
         try {
             if (!isset($data['email'])) {
                 throw new InvalidArgumentException('Missing required email');
@@ -117,6 +117,38 @@ class Ticket {
                         ORDER BY ticket.time DESC, ticket.id DESC";
         $stmt = $db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function ask(array $data) {
+        try {
+            $formParam = array('comment', 'ticketId');
+            foreach ($formParam as $key) {
+                if (!isset($data[$key])) {
+                    throw new InvalidArgumentException("Missing required $key");
+                }
+            }
+            $commentLength = strlen($data['comment']);
+            if ($commentLength > 64000 || $commentLength == 0) {
+                throw new InvalidArgumentException('Comment max length 64000 and not empty');
+            }
+            $ticketId = filter_var($data['ticketId'], FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1)
+            ));
+            if (!$ticketId) {
+                throw new InvalidArgumentException('Invalid ticket id');
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        $db = Db::getDb();
+        $sql = 'SELECT id FROM customer WHERE name = ?';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($data['customerEmail']));
+        $userId = $stmt->fetchColumn();
+
+        $sql = 'INSERT INTO comment (content, user, ticket_id) VALUES (?, ?, ?)';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($data['comment'], $userId, $ticketId));
     }
 
 }
