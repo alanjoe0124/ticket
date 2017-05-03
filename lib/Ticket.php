@@ -180,4 +180,16 @@ class Ticket {
         return $ticketRow;
     }
 
+    public function comment(array $data) {
+        $db = Db::getDb();
+        $sql = 'SELECT  comment.content,
+                        user,
+                        user_type
+                    FROM comment
+                    WHERE comment.ticket_id = ' . $data['ticket'] . ' ORDER BY time DESC, id DESC';
+        $stmt = $db->query($sql);
+        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $comments;
+    }
+
 }
