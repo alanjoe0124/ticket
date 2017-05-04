@@ -1,8 +1,11 @@
 <?php
 
 class Ask {
-    
+
     public function post(array $post, array $session) {
+        if (!isset($session['customerEmail'])) {
+            throw new InvalidArgumentException('Missing required customerEmail');
+        }
         $formParam = array('comment', 'ticketId');
         foreach ($formParam as $key) {
             if (!isset($post[$key])) {
@@ -30,5 +33,5 @@ class Ask {
         $stmt->execute(array($post['comment'], $userId, $ticketId));
         return $ticketId;
     }
-    
+
 }

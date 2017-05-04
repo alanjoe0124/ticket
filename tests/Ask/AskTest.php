@@ -40,6 +40,17 @@ class Ask_postTest extends Ticket_Database_TestCase {
 
     /**
      * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage Missing required customerEmail
+     */
+    public function testCustomerEmailIsRequired(){
+        unset($this->session['customerEmail']);
+        
+        $ask = new Ask();
+        $ask->post($this->post, $this->session);
+    }
+    
+    /**
+     * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Missing required comment
      */
     public function testCommentIsRequired() {

@@ -9,7 +9,7 @@ if ($_POST) {
         $ask = new Ask();
         $ticketId = $ask->post($_POST, $_SESSION);
     } catch (InvalidArgumentException $e) {
-        exit('Form Param error');
+        exit('Argument Invalid');
     } catch (Exception $e) {
         exit('Server error');
     }
