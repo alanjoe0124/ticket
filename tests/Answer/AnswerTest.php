@@ -24,7 +24,18 @@ class Answer_postTest extends Ticket_Database_TestCase {
                     'comment' => array()
         ));
     }
-
+    
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Missing required uid
+     */
+    public function testSessionUidIsRequired(){
+        unset($this->session['uid']);
+        
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
+    }
+    
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Missing required comment

@@ -3,7 +3,11 @@
 class Answer {
 
     public function post(array $post, array $session) {
-
+        
+        if(!isset($session['uid'])){
+            throw new InvalidArgumentException('Missing required uid');
+        }
+        
         $formParam = array('comment', 'ticketId');
         foreach ($formParam as $key) {
             if (!isset($post[$key])) {
