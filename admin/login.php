@@ -1,4 +1,6 @@
 <?php
+include_once __DIR__.'/../lib/Login.php';
+include_once __DIR__.'/../lib/Db.php';
 session_start();
 if (isset($_SESSION['uid'])) {
     header('Location:/admin/ticket_manage.php');
