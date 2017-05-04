@@ -9,10 +9,10 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
 
     public function setUp() {
         $this->data = array(
-            'title' => 'how to write blog?',
-            'description' => 'RT. how to write blog?',
-            'email' => 'test002@163.com',
-            'domain' => 'ourblog.dev'
+            'title'         => 'how to write blog?',
+            'description'   => 'RT. how to write blog?',
+            'email'         => 'test002@163.com',
+            'domain'        => 'ourblog.dev'
         );
 
         parent::setUp();
@@ -20,10 +20,10 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
 
     public function getDataSet() {
         return $this->createArrayDataSet(array(
-                    'customer' => array(
+                    'customer'  => array(
                         array('id' => 1, 'name' => 'test001@163.com')
                     ),
-                    'ticket' => array()
+                    'ticket'    => array()
         ));
     }
 
@@ -71,66 +71,65 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
         $ticket->create($this->data);
     }
 
-    public function titleProvider() {
-        $data = '';
-        for ($i = 0; $i < 501; $i++) {
-            $data .= 'a';
-        }
-        return array(
-            array($data),
-            array('')
-        );
-    }
-
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Title max length 500, min length 1
-     * @dataProvider titleProvider
      */
-    public function testTitleLength($title) {
+    public function testTitleMaxLength() {
+        $title = '';
+        for ($i = 0; $i < 501; $i++) {
+            $title .= 'a';
+        }
         $this->data['title'] = $title;
         $ticket = new Ticket();
         $ticket->create($this->data);
     }
 
-    public function descriptionProvider() {
-        $data = '';
-        for ($i = 0; $i < 64001; $i++) {
-            $data .= 'a';
-        }
-        return array(
-            array($data)
-        );
+    /**
+     * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage Title max length 500, min length 1
+     */
+    public function testTitleMinLength() {
+        $title = '';
+        $this->data['title'] = $title;
+        $ticket = new Ticket();
+        $ticket->create($this->data);
     }
 
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Max description is 64000
-     * @dataProvider descriptionProvider
      */
-    public function testDescriptionLength($description) {
+    public function testDescriptionLength() {
+        $description = '';
+        for ($i = 0; $i < 64001; $i++) {
+            $description .= 'a';
+        }
         $this->data['description'] = $description;
         $ticket = new Ticket();
         $ticket->create($this->data);
     }
 
-    public function emailProvider() {
-        $data = '';
+    /**
+     * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage Email min length 4, max length 100
+     */
+    public function testEmailMaxLength() {
+        $email = '';
         for ($i = 0; $i < 101; $i++) {
-            $data .= 'a';
+            $email .= 'a';
         }
-        return array(
-            array($data),
-            array('abc')
-        );
+        $this->data['email'] = $email;
+        $ticket = new Ticket();
+        $ticket->create($this->data);
     }
 
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Email min length 4, max length 100
-     * @dataProvider emailProvider
      */
-    public function testEmailLength($email) {
+    public function testEmailMinLength() {
+        $email = 'abc';
         $this->data['email'] = $email;
         $ticket = new Ticket();
         $ticket->create($this->data);
@@ -139,7 +138,6 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     /**
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Email invalid
-     * @dataProvider emailProvider
      */
     public function testEmailInvalid() {
         $this->data['email'] = 'ourblog.com';
@@ -151,12 +149,12 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
      * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Domain invalid
      */
-    public function testDomainInvalid(){
+    public function testDomainInvalid() {
         $this->data['domain'] = 'ourblog.com';
         $ticket = new Ticket();
         $ticket->create($this->data);
     }
-    
+
     public function testNewCustomerCreateTicket() {
         $ticket = new Ticket();
         $ticket->create($this->data);
