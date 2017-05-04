@@ -10,7 +10,7 @@ $sql = "SELECT comment.content,
                user_type
             FROM comment 
             WHERE comment.ticket_id = $ticketId ORDER BY time DESC, id DESC";
-$stmt = $db->query($sql);
+$stmt = Db::getDb()->query($sql);
 $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?> 
 <HR width="100%">
@@ -33,7 +33,7 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $table = 'user';
                     }
                     $sql = 'SELECT name FROM ' . $table . ' WHERE id = ' . $row['user'];
-                    $stmt = $db->query($sql);
+                    $stmt = Db::getDb()->query($sql);
                     $name = $stmt->fetchColumn();
                     echo htmlspecialchars($name);
                     ?>

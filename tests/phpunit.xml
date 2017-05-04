@@ -11,6 +11,9 @@
         <testsuite name="Ticket">
             <directory suffix="Test.php">./Ticket</directory>
         </testsuite>
+        <testsuite name="Ask">
+            <directory suffix="Test.php">./Ask</directory>
+        </testsuite>
     </testsuites>
     
     <filter>

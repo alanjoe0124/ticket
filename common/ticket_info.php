@@ -13,7 +13,7 @@ $sql = "SELECT customer.name AS customer,
                                       INNER JOIN status ON ticket.status = status.id 
                         WHERE 
                                ticket.id = $ticketId";
-$stmt = $db->query($sql);
+$stmt = Db::getDb()->query($sql);
 $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 <div>ticket info:
