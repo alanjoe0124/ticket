@@ -56,19 +56,19 @@ class Ticket {
         }
     }
 
-    public function close(array $data) {
-        try {
-            if (!isset($data['customerEmail'])) {
-                throw new InvalidArgumentException('Missing required customerEmail');
-            }
-            if (!isset($data['ticket'])) {
-                throw new InvalidArgumentException('Missing required ticket');
-            }
-            $ticketId = filter_var($data['ticket'], FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1)
-            ));
-        } catch (Exception $e) {
-            throw $e;
+    public function close(array $get, array $session) {
+ 
+        if (!isset($session['customerEmail'])) {
+            throw new InvalidArgumentException('Missing required customerEmail');
+        }
+        if (!isset($get['ticket'])) {
+            throw new InvalidArgumentException('Missing required ticket');
+        }
+        $ticketId = filter_var($get['ticket'], FILTER_VALIDATE_INT, array(
+            'options' => array('min_range' => 1)
+        ));
+        if(!$ticketId){
+            throw new InvalidArgumentException('Ticket id is invalid');
         }
         $db = Db::getDb();
         $sql = "SELECT ticket.status
@@ -77,196 +77,17 @@ class Ticket {
                 WHERE 
                     customer.name = ? AND ticket.id = $ticketId";
         $stmt = $db->prepare($sql);
-        $stmt->execute(array($data['customerEmail']));
+        $stmt->execute(array($session['customerEmail']));
         $status = $stmt->fetchColumn();
+        
         if (!$status) {
             throw new InvalidArgumentException('Customer Email and ticket id not related');
         }
+ 
         if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
             $sql = $db->exec("UPDATE ticket SET status = 2 WHERE id = $ticketId");
         }
-    }
-
-    public function view(array $data) {
-        try {
-            if (!isset($data['email'])) {
-                throw new InvalidArgumentException('Missing required email');
-            }
-            $emailLength = strlen($data['email']);
-            if ($emailLength > 100 || $emailLength < 4) {
-                throw new InvalidArgumentException('Email min length 4, max length 100');
-            }
-            $email = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
-            if (!$email) {
-                throw new InvalidArgumentException('Email invalid');
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        $db = Db::getDb();
-        $stmt = $db->prepare('SELECT id FROM customer WHERE name = ?');
-        $stmt->execute(array($email));
-        $customerId = $stmt->fetchColumn();
-
-        $sql = "SELECT ticket.id,
-                               ticket.title, 
-                               status.name as status 
-                        FROM   ticket 
-                               INNER JOIN  status ON ticket.status = status.id 
-                        WHERE user = $customerId
-                        ORDER BY ticket.time DESC, ticket.id DESC";
-        $stmt = $db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function ask(array $data) {
-        try {
-            $formParam = array('comment', 'ticketId');
-            foreach ($formParam as $key) {
-                if (!isset($data[$key])) {
-                    throw new InvalidArgumentException("Missing required $key");
-                }
-            }
-            $commentLength = strlen($data['comment']);
-            if ($commentLength > 64000 || $commentLength == 0) {
-                throw new InvalidArgumentException('Comment max length 64000 and not empty');
-            }
-            $ticketId = filter_var($data['ticketId'], FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1)
-            ));
-            if (!$ticketId) {
-                throw new InvalidArgumentException('Invalid ticket id');
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        $db = Db::getDb();
-        $sql = 'SELECT id FROM customer WHERE name = ?';
-        $stmt = $db->prepare($sql);
-        $stmt->execute(array($data['customerEmail']));
-        $userId = $stmt->fetchColumn();
-
-        $sql = 'INSERT INTO comment (content, user, ticket_id) VALUES (?, ?, ?)';
-        $stmt = $db->prepare($sql);
-        $stmt->execute(array($data['comment'], $userId, $ticketId));
-    }
-
-    public function info(array $data) {
-        try {
-            if (!isset($data['customerEmail'])) {
-                throw new InvalidArgumentException('Missing required customer email');
-            }
-            $ticketId = filter_var($data['ticket'], FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1)
-            ));
-            if (!$ticketId) {
-                throw new InvalidArgumentException('Invalid ticket id');
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        $db = Db::getDb();
-        $sql = "SELECT customer.name AS customer,
-                        ticket.id AS id,
-                        ticket.title,
-                        ticket.description,
-                        status.name AS status
-                    FROM customer INNER JOIN ticket ON customer.id = ticket.user
-                        INNER JOIN status ON ticket.status = status.id
-                    WHERE
-                        ticket.id = $ticketId";
-        $stmt = $db->query($sql);
-        $ticketRow = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $ticketRow;
-    }
-
-    public function comment(array $data) {
-        $db = Db::getDb();
-        $sql = 'SELECT  comment.content,
-                        user,
-                        user_type
-                    FROM comment
-                    WHERE comment.ticket_id = ' . $data['ticket'] . ' ORDER BY time DESC, id DESC';
-        $stmt = $db->query($sql);
-        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $comments;
-    }
-
-    public function login(array $data) {
-        try {
-            $paramArr = array('userName', 'pwd');
-            foreach ($paramArr as $param) {
-                if (!isset($data[$param])) {
-                    throw new InvalidArgumentException("Missing required $param");
-                }
-            }
-            $data['userName'] = trim($data['userName']);
-            $userNameLength = mb_strlen($data['userName'], 'UTF-8');
-            if ($userNameLength > 50 || $userNameLength < 3) {
-                throw new InvalidArgumentException('User name max length 50, min length 3');
-            }
-            $pwdLength = strlen($data['pwd']);
-            if ($pwdLength > 40 || $pwdLength < 5) {
-                throw new InvalidArgumentException('Password max length 40, min length 5');
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        $db = Db::getDb();
-        $sql = 'SELECT id, name FROM user WHERE name = ? and pwd = ?';
-        $stmt = $db->prepare($sql);
-        $salt = 'acd806b0-d563-4824-907f-852f8f1003a5';
-        $stmt->execute(array($data['userName'], md5($data['pwd'] . $salt)));
-        $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $userRow;
-    }
-
-    public function manage() {
-        $sql = 'SELECT  status.name AS status,
-                                ticket.id AS id,
-                                ticket.title,
-                                ticket.user as customer, 
-                                ticket.domain,
-                                customer.name as customer
-                        FROM    ticket 
-                                INNER JOIN status ON status.id = ticket.status
-                                INNER JOIN customer ON ticket.user = customer.id
-                        WHERE 
-                                status = 1    
-                                ORDER BY time DESC, ticket.id DESC';
-        // ticket status ( 1 => pending, 2 => close ) 
-        $db = Db::getDb();
-        $stmt = $db->query($sql);
-        $ticketRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $ticketRows;
-    }
-
-    public function answer(array $data) {
-        try {
-            $formParam = array('comment', 'ticketId');
-            foreach ($formParam as $key) {
-                if (!isset($data[$key])) {
-                    throw new InvalidArgumentException("Missing required $key");
-                }
-            }
-            $commentLength = strlen($data['comment']);
-            if ($commentLength > 64000 || $commentLength == 0) {
-                throw new InvalidArgumentException('Comment max length 64000 and not empty');
-            }
-            $ticketId = filter_var($data['ticketId'], FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1)
-            ));
-            if (!$ticketId) {
-                throw new InvalidArgumentException('Invalid ticket id');
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        $db = Db::getDb();
-        $sql = 'INSERT INTO comment (content, user, ticket_id, user_type) VALUES (?, ?, ?, ?)';
-        $stmt = $db->prepare($sql);
-        $stmt->execute(array($data['comment'], $data['uid'], $ticketId, 2)); 
-        // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
+        return $ticketId;
     }
 
 }
