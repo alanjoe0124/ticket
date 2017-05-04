@@ -1,17 +1,20 @@
 <?php
 
 include_once TICKET_LIB . '/Db.php';
-include_once TICKET_LIB . '/Ticket.php';
+include_once TICKET_LIB . '/Answer.php';
 
-class Ticket_AnswerTest extends Ticket_Database_TestCase {
+class Answer_postTest extends Ticket_Database_TestCase {
 
-    protected $data;
+    protected $post;
+    protected $session;
 
     public function setUp() {
-        $this->data = array(
-            'comment' => 'Thanks for your ask',
-            'ticketId' => 1,
-            'uid' => 1
+        $this->post = array(
+            'comment'   => 'Thanks for your ask',
+            'ticketId'  => 1
+        );
+        $this->session = array(
+            'uid'       => 1
         );
         parent::setUp();
     }
@@ -27,10 +30,10 @@ class Ticket_AnswerTest extends Ticket_Database_TestCase {
      * @expectedExceptionMessage Missing required comment
      */
     public function testCommentIsRequired() {
-        unset($this->data['comment']);
+        unset($this->post['comment']);
 
-        $ticket = new Ticket();
-        $ticket->answer($this->data);
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
     }
 
     /**
@@ -38,33 +41,37 @@ class Ticket_AnswerTest extends Ticket_Database_TestCase {
      * @expectedExceptionMessage Missing required ticketId
      */
     public function testTicketIdIsRequired() {
-        unset($this->data['ticketId']);
+        unset($this->post['ticketId']);
 
-        $ticket = new Ticket();
-        $ticket->answer($this->data);
-    }
-
-    public function commentProvider() {
-        $data = '';
-        for ($i = 0; $i < 64001; $i++) {
-            $data .= 'a';
-        }
-        return array(
-            array($data),
-            array('')
-        );
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Comment max length 64000 and not empty
-     * @dataProvider commentProvider
      */
-    public function testCommentLength($comment) {
-        $this->data['comment'] = $comment;
+    public function testCommentMaxLength() {
+        $comment = '';
+        for ($i = 0; $i < 64001; $i++) {
+            $comment .= 'a';
+        }
+        $this->post['comment'] = $comment;
 
-        $ticket = new Ticket();
-        $ticket->answer($this->data);
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Comment max length 64000 and not empty
+     */
+    public function testCommentMinLength() {
+        $comment = '';
+        $this->post['comment'] = $comment;
+
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
     }
 
     /**
@@ -72,15 +79,15 @@ class Ticket_AnswerTest extends Ticket_Database_TestCase {
      * @expectedExceptionMessage Invalid ticket id
      */
     public function testTicketIdInvalid() {
-        $this->data['ticketId'] = 'ticket';
+        $this->post['ticketId'] = 'ticket';
 
-        $ticket = new Ticket();
-        $ticket->answer($this->data);
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
     }
 
     public function testPostAnswerComment() {
-        $ticket = new Ticket();
-        $ticket->answer($this->data);
+        $answer = new Answer();
+        $answer->post($this->post, $this->session);
         $expectedDataSet = $this->createArrayDataSet(include __DIR__ . '/expects/answer_comment.php');
 
         $dataSet = $this->getConnection()->createDataSet(array('comment'));
