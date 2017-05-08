@@ -56,20 +56,8 @@ class Ticket {
         }
     }
 
-    public function close(array $get, array $session) {
- 
-        if (!isset($session['customerEmail'])) {
-            throw new InvalidArgumentException('Missing required customerEmail');
-        }
-        if (!isset($get['ticket'])) {
-            throw new InvalidArgumentException('Missing required ticket');
-        }
-        $ticketId = filter_var($get['ticket'], FILTER_VALIDATE_INT, array(
-            'options' => array('min_range' => 1)
-        ));
-        if(!$ticketId){
-            throw new InvalidArgumentException('Ticket id is invalid');
-        }
+    public function close($userEmail, $ticketId) {
+
         $db = Db::getDb();
         $sql = "SELECT ticket.status
                 FROM ticket 
@@ -77,17 +65,18 @@ class Ticket {
                 WHERE 
                     customer.name = ? AND ticket.id = $ticketId";
         $stmt = $db->prepare($sql);
-        $stmt->execute(array($session['customerEmail']));
+        $stmt->execute(array($userEmail));
         $status = $stmt->fetchColumn();
-        
+
         if (!$status) {
             throw new InvalidArgumentException('Customer Email and ticket id not related');
         }
- 
+
         if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
             $sql = $db->exec("UPDATE ticket SET status = 2 WHERE id = $ticketId");
         }
-        return $ticketId;
     }
+
+ 
 
 }

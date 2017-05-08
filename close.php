@@ -6,8 +6,20 @@ include __DIR__ . '/lib/Ticket.php';
 
 session_start();
 try {
+    if (!isset($_SESSION['customerEmail'])) {
+        throw new InvalidArgumentException('Missing required customerEmail');
+    }
+    if (!isset($_GET['ticket'])) {
+        throw new InvalidArgumentException('Missing required ticket');
+    }
+    $ticketId = filter_var($_GET['ticket'], FILTER_VALIDATE_INT, array(
+        'options' => array('min_range' => 1)
+    ));
+    if (!$ticketId) {
+        throw new InvalidArgumentException('Ticket id is invalid');
+    }
     $ticket = new Ticket();
-    $ticketId = $ticket->close($_GET, $_SESSION);
+    $ticket->close($_SESSION['customerEmail'], $ticketId);
 } catch (InvalidArgumentException $e) {
     exit($e->getMessage());
 } catch (Exception $e) {
