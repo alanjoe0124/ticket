@@ -77,6 +77,34 @@ class Ticket {
         }
     }
 
- 
+    public function commentPost($ticketId, $comment, $userId, $userType) {
+
+        if (!isset($userId)) {
+            throw new InvalidArgumentException('Missing required userId');
+        }
+        if (!isset($ticketId)) {
+            throw new InvalidArgumentException('Missing required ticketId');
+        }
+        if (!isset($comment)) {
+            throw new InvalidArgumentException('Missing required comment');
+        }
+        $commentLength = strlen($comment);
+        if ($commentLength > 64000 || $commentLength == 0) {
+            throw new InvalidArgumentException('Comment max length 64000 and not empty');
+        }
+        $ticketId = filter_var($ticketId, FILTER_VALIDATE_INT, array(
+            'options' => array('min_range' => 1)
+        ));
+        if (!$ticketId) {
+            throw new InvalidArgumentException('Invalid ticket id');
+        }
+
+        $db = Db::getDb();
+        $sql = 'INSERT INTO comment (content, user, ticket_id, user_type) VALUES (?, ?, ?, ?)';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($comment, $userId, $ticketId, $userType));
+        // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
+        return $ticketId;
+    }
 
 }

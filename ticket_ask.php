@@ -4,10 +4,20 @@ session_start();
 include __DIR__ . '/lib/Db.php';
 
 if ($_POST) {
-    include __DIR__ . '/lib/Ask.php';
+    include __DIR__ . '/lib/Ticket.php';
     try {
-        $ask = new Ask();
-        $ticketId = $ask->post($_POST, $_SESSION);
+        if (!isset($_SESSION['customerEmail'])) {
+            throw new InvalidArgumentException('Missing required customerEmail');
+        }
+
+        $db = Db::getDb();
+        $sql = 'SELECT id FROM customer WHERE name = ?';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($_SESSION['customerEmail']));
+        $userId = $stmt->fetchColumn();
+
+        $ticket = new Ticket();
+        $ticketId = $ticket->commentPost($_POST['ticketId'], $_POST['comment'], $userId, 1);
     } catch (InvalidArgumentException $e) {
         exit('Argument Invalid');
     } catch (Exception $e) {

@@ -2,12 +2,12 @@
 
 require_once __DIR__ . '/../prevent_csrf.php';
 require_once __DIR__ . '/../lib/Db.php';
-require_once __DIR__ . '/../lib/Answer.php';
+require_once __DIR__ . '/../lib/Ticket.php';
 session_start();
 if ($_POST) {
     try {
-        $answer = new Answer();
-        $ticketId = $answer->post($_POST, $_SESSION);
+        $ticket = new Ticket();
+        $ticketId = $ticket->commentPost($_POST['ticketId'], $_POST['comment'], $_SESSION['uid'], 2);
     } catch (InvalidArgumentException $e) {
         exit('Argument Invalid');
     } catch (Exception $e){
@@ -42,9 +42,9 @@ try {
 <div class="sidebox"> </div>
 <div class="mainbox">
     <?php
-    include __DIR__ . '/../common/ticket_info.php';
-    include __DIR__ . '/../common/ticket_comments.php';
-    include __DIR__ . '/../common/ticket_comment_form.php';
+        include __DIR__ . '/../common/ticket_info.php';
+        include __DIR__ . '/../common/ticket_comments.php';
+        include __DIR__ . '/../common/ticket_comment_form.php';
     ?>
 </div>
 </body>
