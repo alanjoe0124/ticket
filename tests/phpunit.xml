@@ -1,34 +1,17 @@
-<phpunit
-    bootstrap="bootstrap.php"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnError="true"
-    stopOnFailure="true"
-    verbose="true">
-    
-    <testsuites>
-        <testsuite name="Ticket">
-            <directory suffix="Test.php">./Ticket</directory>
-        </testsuite>
-        <testsuite name="Ask">
-            <directory suffix="Test.php">./Ask</directory>
-        </testsuite>
-        <testsuite name="Answer">
-            <directory suffix="Test.php">./Answer</directory>
-        </testsuite>
-        <testsuite name="Login">
-            <directory suffix="Test.php">./Login</directory>
-        </testsuite>
-    </testsuites>
+<phpunit bootstrap="./bootstrap.php">
+    <testsuite name="Application Test Suite">
+        <directory>./application</directory>
+    </testsuite>
+    <testsuite name="Library Test Suite">
+        <directory>./library</directory>
+    </testsuite>
     
     <filter>
+        <!-- If Zend Framework is inside your project's library, uncomment this filter -->
+        <!-- 
         <whitelist>
-            <directory suffix=".php">../lib</directory>
+            <directory suffix=".php">../../library/Zend</directory>
         </whitelist>
+        -->
     </filter>
-    
-    <logging>
-        <log type="coverage-html" target="./report"/>
-    </logging>
 </phpunit>
