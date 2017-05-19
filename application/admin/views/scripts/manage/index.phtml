@@ -1,0 +1,41 @@
+ 
+<div class="container">
+    <div class="headbox">
+        <div class="head-main-box">
+            <div class="head-title">
+                <h1>Ticket</h1>
+                <p>user: 
+                    <?php
+                    $session = new Zend_Session_Namespace();
+                    echo $this->escape($session->userName);
+                    ?> / <a href="/admin/Manage/logout">logout</a>
+                </p>
+            </div>
+            <HR width="100%">
+        </div>
+    </div> 
+
+    <div class="mainbox">
+        <table>
+            <tr>
+                <th>title</th>
+                <th>customer</th>
+                <th>status</th>
+                <th>time</th>
+                <th>domain</th>
+            </tr>
+            <?php foreach ($this->paginator as $row): ?>
+                <tr>
+                    <td><a href = "/admin/Answer/index?ticket=<?php echo $row['id']; ?> ">
+                            <?php echo $this->escape($row['title']); ?></a></td>
+                    <td><?php echo $this->escape($row['customer']); ?></td>
+                    <td><?php echo $row['status']; ?></td>
+                    <td><?php echo $row['time']; ?></td>
+                    <td><?php echo $this->escape($row['domain']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+
+        </table> 
+        <p><?php echo $this->paginator; ?></p>
+    </div> 
+</div>
