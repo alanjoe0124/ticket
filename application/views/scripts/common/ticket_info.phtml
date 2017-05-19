@@ -1,0 +1,46 @@
+<?php
+if (!isset($this->ticketId)) {
+    exit("Missing required ticket");
+}
+
+
+$db = Zend_Db_Table_Abstract::getDefaultAdapter();
+$select = $db->select()
+        ->from('customer', array('customer' => 'name'))
+        ->joinInner('ticket', 'customer.id = ticket.user', array(
+            'id' => 'ticket.id',
+            'title',
+            'description',
+            'time'
+        ))
+        ->joinInner('status', 'ticket.status = status.id', array('status' => 'name'))
+        ->where("ticket.id = $this->ticketId");
+$ticketRow = $db->fetchRow($select);
+?>
+<div>ticket info:
+    <?php $session = new Zend_Session_Namespace(); ?>
+    <?php if (isset($session->customerEmail)): ?>
+        <?php if ($ticketRow['status'] == "pending"): ?>
+            <a href="/index.php/Ask/close?ticket=<?php echo $this->ticketId; ?>"><button>close</button></a>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+<HR width="100%">
+<div>
+    <table>
+        <tr>
+            <th>title</th>
+            <th>description</th>
+            <th>customer</th>
+            <th>status</th>
+            <th>time</th>
+        </tr>
+        <tr>
+            <td><?php echo $this->escape($ticketRow['title']); ?></td>
+            <td><?php echo $this->escape($ticketRow['description']); ?></td>
+            <td><?php echo $this->escape($ticketRow['customer']); ?></td>
+            <td><?php echo $ticketRow['status']; ?></td>
+            <td><?php echo $ticketRow['time']; ?></td>       
+        </tr>
+    </table>
+</div>

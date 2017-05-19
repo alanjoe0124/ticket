@@ -1,0 +1,16 @@
+<?php
+if (!isset($this->ticketId)) {
+    exit("Missing required ticket");
+}
+?>
+<HR width="100%">
+<div class="formbox">
+    <form method="POST" action="<?php echo $this->url().'/comment-post' ?>" >
+        <div id="content" class="row-text">
+            text:<textarea name = "comment" rows = "10"  placeholder = "text..."></textarea>
+            <input type = "hidden" name = "ticketId" value = "<?php echo $this->ticketId; ?>"/> 
+            <button type = "submit">submit</button>
+        </div>
+    </form>
+</div>
+
