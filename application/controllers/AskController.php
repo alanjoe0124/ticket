@@ -63,4 +63,30 @@ class AskController extends Zend_Controller_Action {
         }
     }
 
+    public function closeAction() {
+        try {
+            ZendX_Csrf::prevent($_SERVER['HTTP_REFERER']);
+            $session = new Zend_Session_Namespace();
+            if (!isset($session->customerEmail)) {
+                throw new InvalidArgumentException('Missing required customerEmail');
+            }
+            if (!isset($_GET['ticket'])) {
+                throw new InvalidArgumentException('Missing required ticket');
+            }
+            $ticketId = filter_var($_GET['ticket'], FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1)
+            ));
+            if (!$ticketId) {
+                throw new InvalidArgumentException('Ticket id is invalid');
+            }
+            $ticket = new ZendX_Ticket();
+            $ticket->close($session->customerEmail, $ticketId);
+        } catch (InvalidArgumentException $e) {
+            exit($e->getMessage());
+        } catch (Exception $e) {
+            exit($e->getMessage());
+        }
+        $this->redirect("/Ask/index?ticket=$ticketId");
+    }
+
 }

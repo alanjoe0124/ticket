@@ -51,7 +51,7 @@ class ZendX_Ticket {
             throw $e;
         }
     }
-    
+
     public function commentPost($ticketId, $comment, $userId, $userType) {
         if (!isset($userId)) {
             throw new InvalidArgumentException('Missing required userId');
@@ -75,12 +75,31 @@ class ZendX_Ticket {
 
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $db->insert('comment', array(
-            'content'   => $comment, 
-            'user'      => $userId, 
-            'ticket_id' => $ticketId, 
+            'content' => $comment,
+            'user' => $userId,
+            'ticket_id' => $ticketId,
             'user_type' => $userType));
         // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
         return $ticketId;
+    }
+
+    public function close($userEmail, $ticketId) {
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+        $select = $db->select()->from('ticket', array('status'))
+                ->joinInner('customer', 'ticket.user = customer.id')
+                ->where("customer.name = ? AND ticket.id = $ticketId");
+
+        $stmt = $select->query(PDO::FETCH_ASSOC, array($userEmail));
+        $status = $stmt->fetchColumn();
+
+        if (!$status) {
+            throw new InvalidArgumentException('Customer Email and ticket id not related');
+        }
+
+        if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
+            $db->update('ticket', array('status' => 2), "id = $ticketId");
+        }
     }
 
 }
