@@ -1,0 +1,31 @@
+<div class="container">
+ 
+    <div class="headbox">
+        <div class="head-main-box">
+            <p><h1>ticket/Login</h1>
+            <HR width="100%">
+        </div>
+    </div>
+    
+    <div class="mainbox">
+        <?php
+        if (isset($_GET['error'])) {
+            if ($_GET['error'] == 'password_failed') {
+                echo '<p style="color:red">密码不对</p>';
+            }
+        }
+        ?>
+        <form  method="post"> 
+            <div class="row-title">
+                user name:<input type="text"  id="userName" name="userName"  value=""> 
+            </div>
+            <div class="row-title">
+                password:<input type="password"  id="pwd" name="pwd"  value="">
+            </div>
+            <div class="row-title">
+                <button type="submit">submit</button>
+            </div>   
+        </form>
+    </div>
+    
+</div>
