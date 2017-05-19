@@ -13,6 +13,11 @@
         </testsuite>
     </testsuites>
     
+    <testsuites>
+        <testsuite name="Auth">
+            <directory suffix="Test.php">./Auth</directory>
+        </testsuite>
+    </testsuites>
     <filter>
         <whitelist>
             <directory suffix=".php">../library/ZendX</directory>
