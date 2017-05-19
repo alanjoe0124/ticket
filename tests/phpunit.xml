@@ -18,6 +18,12 @@
             <directory suffix="Test.php">./Auth</directory>
         </testsuite>
     </testsuites>
+    
+    <testsuites>
+        <testsuite name="Csrf">
+            <directory suffix="Test.php">./Csrf</directory>
+        </testsuite>
+    </testsuites>
     <filter>
         <whitelist>
             <directory suffix=".php">../library/ZendX</directory>
