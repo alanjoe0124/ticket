@@ -1,6 +1,6 @@
 <?php
 
-class ZendX_Auth implements Zend_Auth_Adapter_Interface {
+class MyLib_Auth implements Zend_Auth_Adapter_Interface {
 
     const SALT = 'acd806b0-d563-4824-907f-852f8f1003a5';
 
