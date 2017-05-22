@@ -7,6 +7,13 @@ class MyLib_Ticket
     private $userId;
     private $userType;
 
+    public function __construct($ticketId = NULL, $userId = NULL, $userType = NULL)
+    {
+        $this->ticketId = $ticketId;
+        $this->userId = $userId;
+        $this->userType = $userType;
+    }
+
     public function create(array $data)
     {
         $paramArr = array('title', 'description', 'email', 'domain');
@@ -57,12 +64,12 @@ class MyLib_Ticket
         }
     }
 
-    public function commentPost($ticketId, $comment, $userId, $userType)
+    public function commentPost($comment)
     {
-        if (!isset($userId)) {
+        if (!isset($this->userId)) {
             throw new InvalidArgumentException('Missing required userId');
         }
-        if (!isset($ticketId)) {
+        if (!isset($this->ticketId)) {
             throw new InvalidArgumentException('Missing required ticketId');
         }
         if (!isset($comment)) {
@@ -72,21 +79,21 @@ class MyLib_Ticket
         if ($commentLength > 64000 || $commentLength == 0) {
             throw new InvalidArgumentException('Comment max length 64000 and not empty');
         }
-        $ticketId = filter_var($ticketId, FILTER_VALIDATE_INT, array(
+        $this->ticketId = filter_var($this->ticketId, FILTER_VALIDATE_INT, array(
             'options' => array('min_range' => 1)
         ));
-        if (!$ticketId) {
+        if (!$this->ticketId) {
             throw new InvalidArgumentException('Invalid ticket id');
         }
 
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $db->insert('comment', array(
-            'content' => $comment,
-            'user' => $userId,
-            'ticket_id' => $ticketId,
-            'user_type' => $userType));
+            'content'   => $comment,
+            'user'      => $this->userId,
+            'ticket_id' => $this->ticketId,
+            'user_type' => $this->userType));
         // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
-        return $ticketId;
+        return $this->ticketId;
     }
 
     public function close($customerEmail, $ticketId)

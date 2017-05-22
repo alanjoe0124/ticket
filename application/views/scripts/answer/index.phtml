@@ -1,21 +1,8 @@
  
 <div class="container">
-    <div class="headbox">
-        <div class="head-main-box">
-            <div class="head-title">
-                <h1>Ticket</h1>
-                <p>user: 
-                    <?php
-                        $session = new Zend_Session_Namespace();
-                        echo $this->escape($session->userName);
-                    ?> / <a href="/admin/Answer/logout">logout</a></p>
-            </div>
-            <HR width="100%">
-        </div>
-    </div> 
     <div class="mainbox">
         <?php
-            $this->addScriptPath(APPLICATION_PATH.'/views/scripts/common');
+            $this->addScriptPath(APPLICATION_PATH.'/views/scripts/ask');
             echo $this->render('ticket_info.phtml');
             echo $this->render('comments.phtml');
             echo $this->render('comment_form.phtml');
