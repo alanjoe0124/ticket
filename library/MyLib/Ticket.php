@@ -1,8 +1,14 @@
 <?php
 
-class ZendX_Ticket {
+class MyLib_Ticket
+{
 
-    public function create(array $data) {
+    private $ticketId;
+    private $userId;
+    private $userType;
+
+    public function create(array $data)
+    {
         $paramArr = array('title', 'description', 'email', 'domain');
         foreach ($paramArr as $param) {
             if (!isset($data[$param])) {
@@ -30,21 +36,20 @@ class ZendX_Ticket {
         }
 
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-        $select = $db->select()->from('customer', array('id'))->where('name = ?');
-        $stmt = $select->query(PDO::FETCH_ASSOC, array($data['email']));
-        $customerId = $stmt->fetchColumn();
+        $customerId = $db->fetchOne('SELECT id FROM customer WHERE email = ?', array($data['email']));
         $db->beginTransaction();
         try {
             if (!$customerId) {
-                $db->insert('customer', array('name' => $data['email']));
+                $db->insert('customer', array('email' => $data['email']));
                 $customerId = $db->lastInsertId();
             }
-            $stmt = $db->insert('ticket', array(
-                'title' => $data['title'],
-                'description' => $data['description'],
-                'user' => $customerId,
-                'domain' => $data['domain']));
+            $db->insert('ticket', array(
+                'title'         => $data['title'],
+                'description'   => $data['description'],
+                'customer_id'   => $customerId,
+                'domain'        => $data['domain']
+                    )
+            );
             $db->commit();
         } catch (Exception $e) {
             $db->rollBack();
@@ -52,7 +57,8 @@ class ZendX_Ticket {
         }
     }
 
-    public function commentPost($ticketId, $comment, $userId, $userType) {
+    public function commentPost($ticketId, $comment, $userId, $userType)
+    {
         if (!isset($userId)) {
             throw new InvalidArgumentException('Missing required userId');
         }
@@ -83,14 +89,15 @@ class ZendX_Ticket {
         return $ticketId;
     }
 
-    public function close($userEmail, $ticketId) {
+    public function close($customerEmail, $ticketId)
+    {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
         $select = $db->select()->from('ticket', array('status'))
                 ->joinInner('customer', 'ticket.user = customer.id')
                 ->where("customer.name = ? AND ticket.id = $ticketId");
 
-        $stmt = $select->query(PDO::FETCH_ASSOC, array($userEmail));
+        $stmt = $select->query(PDO::FETCH_ASSOC, array($customerEmail));
         $status = $stmt->fetchColumn();
 
         if (!$status) {

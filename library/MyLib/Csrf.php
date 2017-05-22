@@ -1,8 +1,10 @@
 <?php
 
-class ZendX_Csrf {
+class MyLib_Csrf
+{
 
-    public static function prevent($referer) {
+    public static function prevent($referer)
+    {
         if (!isset($referer)) {
             throw new InvalidArgumentException('Missing HTTP REFERER');
         }
