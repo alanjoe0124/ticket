@@ -28,6 +28,8 @@ class LoginController extends Zend_Controller_Action
                 exit;
             }
         }
+        $layout = Zend_Layout::getMvcInstance();
+        $layout->setLayout('layout_login');
     }
 
     public function preDispatch()
