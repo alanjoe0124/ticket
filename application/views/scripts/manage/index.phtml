@@ -12,7 +12,7 @@
             <?php foreach ($this->paginator as $row): ?>
                 <tr>
                     <td>
-                        <a href = "/answer/index?ticket=<?php echo $row['id']; ?> "><?php echo $this->escape($row['title']); ?></a>
+                        <a href="/answer/index?ticket=<?php echo $row['id']; ?> "><?php echo $this->escape($row['title']); ?></a>
                     </td>
                     <td><?php echo $this->escape($row['customer']); ?></td>
                     <td><?php echo $row['status']; ?></td>
