@@ -1,8 +1,10 @@
 <?php
 
-class IndexController extends Zend_Controller_Action {
+class IndexController extends Zend_Controller_Action
+{
 
-    public function indexAction() {
+    public function indexAction()
+    {
         try {
             if (!isset($_GET['email'])) {
                 throw new InvalidArgumentException('Missing required email');
@@ -15,19 +17,22 @@ class IndexController extends Zend_Controller_Action {
             if (!$email) {
                 throw new InvalidArgumentException('Email invalid');
             }
-        } catch (Exception $e) {
-            exit("Param error");
+        } catch (InvalidArgumentException $e) {
+            exit('Param error');
         }
- 
+
         $session = new Zend_Session_Namespace();
-        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-        $select = $db->select()->from('customer', array('id'))->where('name = ?', $email);
-        $userId = $db->fetchOne($select);
         if (!isset($session->customerEmail)) {
             Zend_Session::regenerateId();
             $session->customerEmail = $email;
         }
-        $this->view->userId = $userId;
+
+        $customerId = Zend_Db_Table_Abstract::getDefaultAdapter()->fetchOne(
+                'SELECT id FROM customer WHERE email = ?', array($email)
+        );
+        $this->view->customerId = $customerId;
+        $layout = Zend_Layout::getMvcInstance();
+        $layout->setLayout('layout_index');
     }
- 
+
 }

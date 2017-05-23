@@ -1,46 +1,31 @@
 <div class="container">
-    <div class="headbox">
-        <div class="head-main-box">
-            <div class="head-title">
-                <p><h1>Ticket</h1>
-                <p>customer: 
-                    <?php
-                        $session = new Zend_Session_Namespace();
-                        echo $this->escape($session->customerEmail);
-                    ?>
-                </p>
-            </div>
-            <HR width="100%">
-        </div>
-    </div> 
-
     <div class="mainbox">
-        <?php
+        <?php if ($this->customerId): ?>
+            <?php
             $ticketRows = array();
-            if ($this->userId) {
+            if ($this->customerId) {
                 $db = Zend_Db_Table_Abstract::getDefaultAdapter();
                 $select = $db->select()
-                        ->from('ticket', array('id', 'title'))
-                        ->joinInner('status', 'ticket.status = status.id', array('status' => 'status.name'))
-                        ->where("user = $this->userId")
-                        ->order(array('ticket.time DESC', 'ticket.id DESC'));
+                             ->from('ticket', array('id', 'title'))
+                             ->join('status', 'ticket.status_id = status.id', array('status' => 'status.name'))
+                             ->where("customer_id = ".$this->customerId)
+                             ->order(array('ticket.time DESC', 'ticket.id DESC'));
                 $ticketRows = $db->fetchAll($select);
             }
-        ?>
-        <?php foreach ($ticketRows as $row): ?>
-            <div class="row-title">
-                <div class="row-manage-title">
-                    <a href="/index.php/Ask/index?ticket=<?php echo $row['id']; ?>"> <?php echo $this->escape($row['title']); ?> </a>
+            ?>
+            <?php foreach ($ticketRows as $row): ?>
+                <div class="row-title">
+                    <div class="row-manage-title">
+                        <a href="/ask/index?ticket=<?php echo $row['id']; ?>"> <?php echo $this->escape($row['title']); ?> </a>
+                    </div>
+                    <div class="row-manage-status">
+                        <?php echo $row['status']; ?>
+                    </div>
                 </div>
-                <div class="row-manage-status">
-                    <?php echo $row['status']; ?>
-                </div>
-            </div>
-        <?php endforeach; ?>
-        <?php
-            if (!$this->userId) {
-                echo 'You have no ticket';
-            }
-        ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            You have no ticket
+        <?php endif; ?>
+
     </div>
 </div>
