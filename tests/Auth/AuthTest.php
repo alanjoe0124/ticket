@@ -40,7 +40,7 @@ class Auth_Test extends Ticket_Database_TestCase {
      */
     public function testUserNameIsRequired() {
 
-        $auth = new ZendX_Auth(NULL, $this->data['pwd']);
+        $auth = new MyLib_Auth(NULL, $this->data['pwd']);
     }
 
     /**
@@ -49,7 +49,7 @@ class Auth_Test extends Ticket_Database_TestCase {
      */
     public function testPwdIsRequired() {
         unset($this->data['pwd']);
-        $auth = new ZendX_Auth($this->data['userName'], NULL);
+        $auth = new MyLib_Auth($this->data['userName'], NULL);
     }
 
     /**
@@ -62,7 +62,7 @@ class Auth_Test extends Ticket_Database_TestCase {
             $name .= 'a';
         }
         $this->data['userName'] = $name;
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
     }
 
     /**
@@ -72,7 +72,7 @@ class Auth_Test extends Ticket_Database_TestCase {
     public function testUserNameMinLength() {
         $this->data['userName'] = 'ab';
 
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
     }
 
     /**
@@ -86,7 +86,7 @@ class Auth_Test extends Ticket_Database_TestCase {
         }
         $this->data['pwd'] = $pwd;
 
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
     }
 
     /**
@@ -96,29 +96,29 @@ class Auth_Test extends Ticket_Database_TestCase {
     public function testPwdMinLength() {
         $this->data['pwd'] = '1234';
 
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
     }
 
     public function testRightPwd() {
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
         $authResult = $auth->authenticate();
         $this->assertTrue($authResult->isValid());
     }
 
     public function testWrongPwd() {
-        $auth = new ZendX_Auth($this->dataWithWrongPwd['userName'], $this->dataWithWrongPwd['pwd']);
+        $auth = new MyLib_Auth($this->dataWithWrongPwd['userName'], $this->dataWithWrongPwd['pwd']);
         $authResult = $auth->authenticate();
         $this->assertFalse($authResult->isValid());
     }
 
     public function testNoExistUser() {
-        $auth = new ZendX_Auth($this->dataWithNoExistUser['userName'], $this->dataWithNoExistUser['pwd']);
+        $auth = new MyLib_Auth($this->dataWithNoExistUser['userName'], $this->dataWithNoExistUser['pwd']);
         $authResult = $auth->authenticate();
         $this->assertFalse($authResult->isValid());
     }
     
     public function testGetUserName(){
-        $auth = new ZendX_Auth($this->data['userName'], $this->data['pwd']);
+        $auth = new MyLib_Auth($this->data['userName'], $this->data['pwd']);
         $this->assertEquals($this->data['userName'], $auth->getUserName());
     }
 
