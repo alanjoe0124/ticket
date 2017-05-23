@@ -96,7 +96,7 @@ class MyLib_Ticket
         return $this->ticketId;
     }
 
-    public function close($ticketId)
+    public function close($customerEmail,$ticketId)
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $select = $db->select()
@@ -104,7 +104,7 @@ class MyLib_Ticket
                      ->join('customer', 'ticket.customer_id = customer.id')
                      ->where("customer.email = ? AND ticket.id = $ticketId");
         $session = new Zend_Session_Namespace();
-        $statusId = $db->fetchCol($select , array($session->customerEmail));
+        $statusId = $db->fetchCol($select , array($customerEmail));
         if (!$statusId) {
             throw new InvalidArgumentException('Customer Email and ticket id not related');
         }

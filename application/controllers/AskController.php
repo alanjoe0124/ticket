@@ -82,7 +82,7 @@ class AskController extends Zend_Controller_Action
                 throw new InvalidArgumentException('Ticket id is invalid');
             }
             $ticket = new MyLib_Ticket();
-            $ticket->close($ticketId);
+            $ticket->close($session->customerEmail,$ticketId);
         } catch (InvalidArgumentException $e) {
             exit('Argument Invalid');
         } catch (Exception $e) {
