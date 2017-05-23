@@ -1,23 +1,9 @@
-<div class="container">
-    <div class="headbox">
-        <div class="head-main-box">
-            <div class="head-title">
-                <h1>Ticket</h1>
-                <p>user: 
-                    <?php
-                        $session = new Zend_Session_Namespace();
-                        echo $this->escape($session->customerEmail);
-                    ?>
-                </p>
-            </div>
-            <HR width="100%">
-        </div>
-    </div> 
+<div class="container">   
     <div class="mainbox">
         <?php
-            echo $this->render('common/ticket_info.phtml');
-            echo $this->render('common/comments.phtml');
-            echo $this->render('common/comment_form.phtml');
+            echo $this->render('/ask/ticket_info.phtml');
+            echo $this->render('/ask/comments.phtml');
+            echo $this->render('/ask/comment_form.phtml');
         ?>
     </div>
 </div>

@@ -9,7 +9,7 @@ $select = $db->select()
             'description',
             'time'
         ))
-             ->joinInner('status', 'ticket.status_id = status.id', array('status' => 'name'))
+             ->join('status', 'ticket.status_id = status.id', array('status' => 'name'))
              ->where("ticket.id = $this->ticketId");
 $ticketRow = $db->fetchRow($select);
 ?>
@@ -17,7 +17,7 @@ $ticketRow = $db->fetchRow($select);
     <?php $session = new Zend_Session_Namespace(); ?>
     <?php if (isset($session->customerEmail)): ?>
         <?php if ($ticketRow['status'] == "pending"): ?>
-            <a href="/index.php/Ask/close?ticket=<?php echo $this->ticketId; ?>"><button>close</button></a>
+            <a href="/ask/close?ticket=<?php echo $this->ticketId; ?>"><button>close</button></a>
         <?php endif; ?>
     <?php endif; ?>
 </div>

@@ -96,23 +96,21 @@ class MyLib_Ticket
         return $this->ticketId;
     }
 
-    public function close($customerEmail, $ticketId)
+    public function close($ticketId)
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-        $select = $db->select()->from('ticket', array('status'))
-                ->joinInner('customer', 'ticket.user = customer.id')
-                ->where("customer.name = ? AND ticket.id = $ticketId");
-
-        $stmt = $select->query(PDO::FETCH_ASSOC, array($customerEmail));
-        $status = $stmt->fetchColumn();
-
-        if (!$status) {
+        $select = $db->select()
+                     ->from('ticket', array('status_id'))
+                     ->join('customer', 'ticket.customer_id = customer.id')
+                     ->where("customer.email = ? AND ticket.id = $ticketId");
+        $session = new Zend_Session_Namespace();
+        $statusId = $db->fetchCol($select , array($session->customerEmail));
+        if (!$statusId) {
             throw new InvalidArgumentException('Customer Email and ticket id not related');
         }
 
-        if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
-            $db->update('ticket', array('status' => 2), "id = $ticketId");
+        if ($statusId != 2) { // ticket status ( 1 => pending, 2 => close ) 
+            $db->update('ticket', array('status_id' => 2), "id = $ticketId");
         }
     }
 
