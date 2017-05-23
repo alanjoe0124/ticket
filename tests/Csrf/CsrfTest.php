@@ -8,7 +8,7 @@ class Csrf_Test extends PHPUnit_Framework_TestCase {
      */
     public function testHttpRefererIsRequired() {
         $referer = NULL;
-        ZendX_Csrf::prevent($referer);
+        MyLib_Csrf::prevent($referer);
     }
 
     /**
@@ -17,7 +17,7 @@ class Csrf_Test extends PHPUnit_Framework_TestCase {
      */
     public function testServerNameMismatch() {
         $referer = 'http://test.dev';
-        ZendX_Csrf::prevent($referer);
+        MyLib_Csrf::prevent($referer);
     }
 
 }
