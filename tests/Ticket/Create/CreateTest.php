@@ -18,7 +18,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function getDataSet() {
         return $this->createArrayDataSet(array(
                     'customer'  => array(
-                        array('id' => 1, 'name' => 'test001@163.com')
+                        array('id' => 1, 'email' => 'test001@163.com')
                     ),
                     'ticket'    => array()
         ));
@@ -31,7 +31,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testTitleIsRequired() {
         unset($this->data['title']);
 
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -42,7 +42,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testDescriptionIsRequired() {
         unset($this->data['description']);
 
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -53,7 +53,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testEmailIsRequired() {
         unset($this->data['email']);
 
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -64,7 +64,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testDomainIsRequired() {
         unset($this->data['domain']);
 
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -78,7 +78,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
             $title .= 'a';
         }
         $this->data['title'] = $title;
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -89,7 +89,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testTitleMinLength() {
         $title = '';
         $this->data['title'] = $title;
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -103,7 +103,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
             $description .= 'a';
         }
         $this->data['description'] = $description;
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -117,7 +117,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
             $email .= 'a';
         }
         $this->data['email'] = $email;
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -128,7 +128,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testEmailMinLength() {
         $email = 'abc';
         $this->data['email'] = $email;
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -138,7 +138,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
      */
     public function testEmailInvalid() {
         $this->data['email'] = 'ourblog.com';
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
@@ -148,12 +148,12 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
      */
     public function testDomainInvalid() {
         $this->data['domain'] = 'ourblog.com';
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
     }
 
     public function testNewCustomerCreateTicket() {
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
 
         $expectedDataSet = $this->createArrayDataSet(include __DIR__ . '/expects/new-customer.php');
@@ -168,7 +168,7 @@ class Ticket_CreateTest extends Ticket_Database_TestCase {
     public function testCustomerCreateTicket() {
         $this->data['email'] = 'test001@163.com';
 
-        $ticket = new ZendX_Ticket();
+        $ticket = new MyLib_Ticket();
         $ticket->create($this->data);
 
         $expectedDataSet = $this->createArrayDataSet(include __DIR__ . '/expects/customer.php');

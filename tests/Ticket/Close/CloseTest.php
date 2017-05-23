@@ -5,16 +5,16 @@ class Ticket_CloseTest extends Ticket_Database_TestCase {
     public function getDataSet() {
         return $this->createArrayDataSet(array(
                     'customer' => array(
-                        array('id' => 1, 'name' => 'test001@163.com')
+                        array('id' => 1, 'email' => 'test001@163.com')
                     ),
                     'ticket' => array(
                         array(
                             'id'            => 1,
                             'title'         => 'how to write blog?',
                             'description'   => 'RT. how to write blog?',
-                            'user'          => 1,
+                            'customer_id'          => 1,
                             'domain'        => 'ourblog.dev',
-                            'status'        => 1
+                            'status_id'        => 1
                         )
                     )
         ));
@@ -26,13 +26,13 @@ class Ticket_CloseTest extends Ticket_Database_TestCase {
      */
     public function testCloseUnrelatedTicket() {
 
-        $ticket = new ZendX_Ticket();
-        $ticket->close('test001@163.com', 2);
+        $ticket = new MyLib_Ticket();
+        $ticket->close('test001@163.com',2);
     }
 
     public function testCloseTicket() {
-        $ticket = new ZendX_Ticket();
-        $ticket->close('test001@163.com', 1);
+        $ticket = new MyLib_Ticket();
+        $ticket->close('test001@163.com',1);
 
         $expectedDataSet = $this->createArrayDataSet(include __DIR__ . '/expect.php');
 
