@@ -21,4 +21,24 @@ class OurTicket_Util
     {
         return isset($_GET[$key]) ? $_GET[$key] : null;
     }
+    
+    public static function killCSRF()
+    {
+        try {
+            if (!isset($_SERVER['HTTP_REFERER'])) {
+                throw new InvalidArgumentException('Missing HTTP REFERER');
+            }
+
+            if (!preg_match('#^http://([^/]+)#', $_SERVER['HTTP_REFERER'], $matches)) {
+                throw new InvalidArgumentException('invalid HTTP_REFERER');
+            }
+
+            $domain = $matches[1]; 
+            if ($domain != 'ourblog.dev' && $domain != 'ticket.dev') {
+                throw new InvalidArgumentException('CSRF attack !!!');
+            }
+        } catch (InvalidArgumentException $e) {
+            exit;
+        }
+    }
 }

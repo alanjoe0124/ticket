@@ -1,31 +1,36 @@
 <?php
 
-class Login {
+class OurTicket_Login 
+{
+    const SALT = 'acd806b0-d563-4824-907f-852f8f1003a5';
 
-    public function check($data) {
-        $paramArr = array('userName', 'pwd');
-        foreach ($paramArr as $param) {
-            if (!isset($data[$param])) {
-                throw new InvalidArgumentException("Missing required $param");
+    public static function doLogin(array $data)
+    {
+        $requiredKeys = array('name', 'pwd');
+        foreach ($requiredKeys as $key) {
+            if (!isset($data[$key])) {
+                throw new InvalidArgumentException("missing required key $key");
             }
         }
-        $data['userName'] = trim($data['userName']);
-        $userNameLength = mb_strlen($data['userName'], 'UTF-8');
-        if ($userNameLength > 50 || $userNameLength < 3) {
-            throw new InvalidArgumentException('User name max length 50, min length 3');
-        }
-        $pwdLength = strlen($data['pwd']);
-        if ($pwdLength > 40 || $pwdLength < 5) {
-            throw new InvalidArgumentException('Password max length 40, min length 5');
+
+        $data['name'] = trim($data['name']);
+        $len = mb_strlen($data['name'], 'UTF-8');
+        if ($len == 0 || $len > 100) {
+            throw new InvalidArgumentException('name required and maxlength is 100');
         }
 
-        $db = Db::getDb();
-        $sql = 'SELECT id, name FROM user WHERE name = ? and pwd = ?';
-        $stmt = $db->prepare($sql);
-        $salt = 'acd806b0-d563-4824-907f-852f8f1003a5';
-        $stmt->execute(array($data['userName'], md5($data['pwd'] . $salt)));
-        $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $userRow;
+        $len = strlen($data['pwd']);
+        if ($len < 5 || $len > 40) {
+            throw new InvalidArgumentException('pwd minlength is 5, maxlength is 40');
+        }
+
+        $sql  = 'SELECT id, name FROM user WHERE name = ? and pwd = ?';
+        $stmt = OurTicket_Db::getDb()->prepare($sql);
+        $stmt->execute(array(
+            $data['name'],
+            md5($data['pwd'] . self::SALT)
+        ));
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
 }

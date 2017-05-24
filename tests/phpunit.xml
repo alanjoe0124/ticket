@@ -7,8 +7,8 @@
     stopOnFailure="true"
     verbose="true">
     <testsuites>
-        <testsuite name="Ticket">
-            <directory suffix="Test.php">./Ticket</directory>
+        <testsuite name="OurTicket">
+            <directory suffix="Test.php">./OurTicket</directory>
         </testsuite>
     </testsuites>
 

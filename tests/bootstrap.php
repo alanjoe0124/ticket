@@ -5,6 +5,7 @@ define('DB_NAME', 'ticket_test');
 include __DIR__ . '/../lib/OurTicket/Db.php';
 include __DIR__ . '/../lib/OurTicket/Util.php';
 include __DIR__ . '/../lib/OurTicket/Ticket.php';
+include __DIR__ . '/../lib/OurTicket/Login.php';
 
 class Ticket_DbUnit_ArrayDataSet extends PHPUnit_Extensions_Database_DataSet_AbstractDataSet 
 {

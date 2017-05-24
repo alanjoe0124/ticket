@@ -1,78 +1,61 @@
 <?php
-include_once __DIR__.'/../lib/Login.php';
-include_once __DIR__.'/../lib/Db.php';
-session_start();
-if (isset($_SESSION['uid'])) {
-    header('Location:/admin/ticket_manage.php');
-    exit;
-};
+    session_start();
+    if (isset($_SESSION['customerServiceId'])) {
+        header('Location: /admin/ticket_manage.php');
+        exit;
+    }
 
-if ($_POST) {
-    try {
-        require_once __DIR__. '/../prevent_csrf.php';
-        $login = new Login();
-        $userRow = $login->check($_POST);
-    } catch (InvalidArgumentException $e) {
-        exit('Param error');
-    } catch (Exception $e){
-        exit('Server error');
+    $nameOrPwdWrong = false;
+
+    if ($_POST) {
+        include __DIR__ . '/../lib/OurTicket/Util.php';
+        include __DIR__ . '/../lib/OurTicket/Db.php';
+        include __DIR__ . '/../lib/OurTicket/Login.php';
+
+        try {
+            OurTicket_Util::killCSRF();
+            $userRow = OurTicket_Login::doLogin($_POST);
+        } catch (InvalidArgumentException $e) {
+            exit('invalid params');
+        }
+
+        if ($userRow) {
+            session_regenerate_id();
+            $_SESSION['customerServiceId']   = $userRow['id'];
+            $_SESSION['customerServiceName'] = $userRow['name'];
+            header('Location: /admin/ticket_manage.php');
+            exit;
+        }
+
+        $nameOrPwdWrong = true;
     }
-    if ($userRow) {   
-        session_regenerate_id();
-        $_SESSION['uid'] = $userRow['id'];
-        $_SESSION['userName'] = $userRow['name'];
-        header('Location:/admin/ticket_manage.php');
-        exit;
-    } else {
-        header('Location:/admin/login.php?error=password_failed');
-        exit;
-    }
-}
 ?>
+
 <html>
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
-    </head>
-    <body>
-        <div class="container">
-            <!--content_head start-->
-            <div class="headbox">
-                <div class="head-side-box"></div>
-
-                <div class="head-main-box">
-                    <p><h1><a href="/index.php">ticket</a>/Login</h1>
-                    <HR width="100%">
-                </div>
-                <div class="head-side-box"></div>
-            </div>
-            <!--content_head end->
-            
-            <!--contetn_body start-->
-            <div class="sidebox"></div>
-            <div class="mainbox">
-                <?php
-                if (isset($_GET['error'])) {
-                    if ($_GET['error'] == 'password_failed') {
-                        echo '<p style="color:red">密码不对</p>';
-                    }
-                }
-                ?>
-                <form  method="post"> 
-                    <div class="row-title">
-                        user name:<input type="text"  id="userName" name="userName"  value=""> 
-                    </div>
-                    <div class="row-title">
-                        password:<input type="password"  id="pwd" name="pwd"  value="">
-                    </div>
-                    <div class="row-title">
-                        <button type="submit">submit</button>
-                    </div>   
-                </form>
-            </div>
-            <div class="sidebox"></div>
-            <!--contetn_body end-->
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="/common/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="headbox">
+            <h1>Customer Service Login</h1>
         </div>
-    </body>
-</html>
 
+        <form method="post" class="login-form">
+            <?php
+                if ($nameOrPwdWrong) {
+                    echo '<p style="color:red;padding-left:50px;">用户名或密码不对</p>';
+                }
+            ?>
+            <div class="row">
+                user name: <input type="text" name="name">
+            </div>
+            <div class="row">
+                password: <input type="password" name="pwd">
+            </div>
+            <button type="submit">submit</button>
+        </form>
+    </div>
+</body>
+</html>
