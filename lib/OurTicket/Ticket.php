@@ -18,14 +18,7 @@ class OurTicket_Ticket
         if (strlen($data['description']) > 64000) {
             throw new InvalidArgumentException('description too long, maxlength is 64000');
         }
-        $len = strlen($data['email']);
-        if ($len < 4 || $len > 100) {
-            throw new InvalidArgumentException('email minlength 4, maxlength 100');
-        }
-        $data['email'] = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
-        if (!$data['email']) {
-            throw new InvalidArgumentException('invalid email');
-        }
+        $data['email'] = OurTicket_Util::validateEmail($data['email']);
         if ($data['domain'] != 'ourblog.dev') {
             throw new InvalidArgumentException('INVALID_DOMAIN');
         }
