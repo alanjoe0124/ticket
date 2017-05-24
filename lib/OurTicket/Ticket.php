@@ -70,34 +70,32 @@ class OurTicket_Ticket
         }
     }
 
-    public function commentPost($ticketId, $comment, $userId, $userType) {
-
-        if (!isset($userId)) {
-            throw new InvalidArgumentException('Missing required userId');
-        }
-        if (!isset($ticketId)) {
-            throw new InvalidArgumentException('Missing required ticketId');
-        }
-        if (!isset($comment)) {
-            throw new InvalidArgumentException('Missing required comment');
-        }
-        $commentLength = strlen($comment);
-        if ($commentLength > 64000 || $commentLength == 0) {
-            throw new InvalidArgumentException('Comment max length 64000 and not empty');
-        }
-        $ticketId = filter_var($ticketId, FILTER_VALIDATE_INT, array(
-            'options' => array('min_range' => 1)
-        ));
-        if (!$ticketId) {
-            throw new InvalidArgumentException('Invalid ticket id');
+    protected static function comment($ticketId, $comment, $userId, $userType)
+    {
+        $len = mb_strlen($comment, 'UTF-8');
+        if ($len == 0 || $len > 3000) {
+            throw new InvalidArgumentException();
         }
 
-        $db = Db::getDb();
-        $sql = 'INSERT INTO comment (content, user, ticket_id, user_type) VALUES (?, ?, ?, ?)';
-        $stmt = $db->prepare($sql);
-        $stmt->execute(array($comment, $userId, $ticketId, $userType));
-        // user_type ( 1 = > table(`customer`) , 2 => table (`user`)
-        return $ticketId;
+        $sql  = 'INSERT INTO comment (ticket_id, content, user_id, user_type) VALUES (?, ?, ?, ?)';
+        $stmt = OurTicket_Db::getDb()->prepare($sql);
+        $stmt->execute(array($ticketId, $comment, $userId, $userType));
     }
 
+    // 调用此方法前要保证ticketId是数字，并且是customerId的ticket
+    public static function customerAddComment($ticketId, $comment, $customerId)
+    {
+        self::comment($ticketId, $comment, $customerId, 1);
+    }
+
+    // 调用此方法前要保证ticketId是数字
+    public static function customerServiceAddComment($ticketId, $comment, $customerServiceId)
+    {
+        $sql = "SELECT id FROM ticket WHERE id = $ticketId";
+        if (!OurTicket_Db::getDb()->query($sql)->fetchColumn()) {
+            throw new InvalidArgumentException('no such ticketId');
+        }
+
+        self::comment($ticketId, $comment, $customerServiceId, 2);
+    }
 }

@@ -19,8 +19,6 @@
             FROM    ticket
                     INNER JOIN status ON ticket.status_id = status.id
                     INNER JOIN customer ON ticket.customer_id = customer.id
-            WHERE
-                    ticket.status_id = 1
                     ORDER BY ticket.time DESC, ticket.id DESC'; // 1-pending 2-close
     $rows = OurTicket_Db::getDb()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>

@@ -30,3 +30,13 @@
 table th {
     text-align: left;
 }
+
+pre {
+    background-color: #e0e0e0;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+small {
+    font-size: 10px;
+    color: #999;
+}

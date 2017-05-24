@@ -16,12 +16,17 @@ class OurTicket_Util
 
         return $email;
     }
-    
+
     public static function getQuery($key)
     {
         return isset($_GET[$key]) ? $_GET[$key] : null;
     }
-    
+
+    public static function getPost($key)
+    {
+        return isset($_POST[$key]) ? $_POST[$key] : null;
+    }
+
     public static function killCSRF()
     {
         try {
@@ -40,5 +45,12 @@ class OurTicket_Util
         } catch (InvalidArgumentException $e) {
             exit;
         }
+    }
+    
+    public static function DBAIPK($var)
+    {
+        return filter_var($var, FILTER_VALIDATE_INT, array(
+            'options' => array('min_range' => 1)
+        ));
     }
 }

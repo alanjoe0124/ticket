@@ -1,6 +1,7 @@
 <?php
 
 include __DIR__ . '/lib/OurTicket/Db.php';
+include __DIR__ . '/lib/OurTicket/Util.php';
 include __DIR__ . '/lib/OurTicket/Ticket.php';
 
 try {
