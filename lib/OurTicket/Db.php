@@ -2,7 +2,7 @@
 
 defined('DB_NAME') || define('DB_NAME', 'ticket');
 
-class Db
+class OurTicket_Db
 {
     protected static $db;
 

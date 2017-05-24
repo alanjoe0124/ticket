@@ -1,48 +1,48 @@
 <?php
 
-class Ticket {
-
-    public function create(array $data) {
-        $paramArr = array('title', 'description', 'email', 'domain');
-        foreach ($paramArr as $param) {
-            if (!isset($data[$param])) {
-                throw new InvalidArgumentException("Required $param is missing");
+class OurTicket_Ticket
+{
+    public function create(array $data) 
+    {
+        $requiredKeys = array('title', 'description', 'email', 'domain');
+        foreach ($requiredKeys as $key) {
+            if (!isset($data[$key])) {
+                throw new InvalidArgumentException("missing required key $key");
             }
         }
 
-        $titleLength = mb_strlen($data['title'], "UTF-8");
-        if ($titleLength > 500 || $titleLength < 1) {
-            throw new InvalidArgumentException('Title max length 500, min length 1');
+        $len = mb_strlen($data['title'], 'UTF-8');
+        if ($len == 0 || $len > 500) {
+            throw new InvalidArgumentException('title required and maxlength is 500');
         }
         if (strlen($data['description']) > 64000) {
-            throw new InvalidArgumentException('Max description is 64000');
+            throw new InvalidArgumentException('description too long, maxlength is 64000');
         }
-        $emailLength = strlen($data['email']);
-        if ($emailLength > 100 || $emailLength < 4) {
-            throw new InvalidArgumentException('Email min length 4, max length 100');
+        $len = strlen($data['email']);
+        if ($len < 4 || $len > 100) {
+            throw new InvalidArgumentException('email minlength 4, maxlength 100');
         }
         $data['email'] = filter_var($data['email'], FILTER_VALIDATE_EMAIL);
         if (!$data['email']) {
-            throw new InvalidArgumentException('Email invalid');
+            throw new InvalidArgumentException('invalid email');
         }
         if ($data['domain'] != 'ourblog.dev') {
-            throw new InvalidArgumentException('Domain invalid');
+            throw new InvalidArgumentException('INVALID_DOMAIN');
         }
 
-        $db = Db::getDb();
-
-        $stmt = $db->prepare('SELECT id FROM customer WHERE name = ?');
+        $db   = OurTicket_Db::getDb();
+        $stmt = $db->prepare('SELECT id FROM customer WHERE email = ?');
         $stmt->execute(array($data['email']));
         $customerId = $stmt->fetchColumn();
 
         $db->beginTransaction();
         try {
             if (!$customerId) {
-                $stmt = $db->prepare('INSERT INTO customer( name ) VALUES(?)');
+                $stmt = $db->prepare('INSERT INTO customer(email) VALUES(?)');
                 $stmt->execute(array($data['email']));
                 $customerId = $db->lastInsertId();
             }
-            $stmt = $db->prepare('INSERT INTO ticket(title, description, user, domain) VALUES(?, ?, ?, ?)');
+            $stmt = $db->prepare('INSERT INTO ticket(title, description, customer_id, domain) VALUES(?, ?, ?, ?)');
             $stmt->execute(array(
                 $data['title'],
                 $data['description'],

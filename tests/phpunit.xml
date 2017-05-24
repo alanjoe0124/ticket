@@ -6,29 +6,19 @@
     stopOnError="true"
     stopOnFailure="true"
     verbose="true">
-    
     <testsuites>
         <testsuite name="Ticket">
             <directory suffix="Test.php">./Ticket</directory>
         </testsuite>
-        <testsuite name="Ask">
-            <directory suffix="Test.php">./Ask</directory>
-        </testsuite>
-        <testsuite name="Answer">
-            <directory suffix="Test.php">./Answer</directory>
-        </testsuite>
-        <testsuite name="Login">
-            <directory suffix="Test.php">./Login</directory>
-        </testsuite>
     </testsuites>
-    
+
     <filter>
         <whitelist>
             <directory suffix=".php">../lib</directory>
         </whitelist>
     </filter>
-    
+
     <logging>
-        <log type="coverage-html" target="./report"/>
+        <log type="coverage-html" target="./report" />
     </logging>
 </phpunit>
