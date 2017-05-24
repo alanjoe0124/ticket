@@ -49,25 +49,26 @@ class OurTicket_Ticket
         }
     }
 
-    public function close($userEmail, $ticketId) {
-
-        $db = Db::getDb();
-        $sql = "SELECT ticket.status
-                FROM ticket 
-                    INNER JOIN customer ON ticket.user = customer.id
-                WHERE 
-                    customer.name = ? AND ticket.id = $ticketId";
-        $stmt = $db->prepare($sql);
-        $stmt->execute(array($userEmail));
-        $status = $stmt->fetchColumn();
-
-        if (!$status) {
-            throw new InvalidArgumentException('Customer Email and ticket id not related');
+    public static function close($ticketId, $customerId)
+    {
+        $ticketId = OurTicket_Util::DBAIPK($ticketId);
+        if (!$ticketId) {
+            throw new InvalidArgumentException('invalid ticketId');
         }
 
-        if ($status != 2) { // ticket status ( 1 => pending, 2 => close ) 
-            $sql = $db->exec("UPDATE ticket SET status = 2 WHERE id = $ticketId");
+        $sql = "SELECT id, status_id FROM ticket WHERE id = $ticketId AND customer_id = $customerId";
+        $db  = OurTicket_Db::getDb();
+        $row = $db->query($sql)->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            throw new InvalidArgumentException('ticketId not exists or not your ticket');
         }
+        
+        // 1-pending 2-close
+        if ($row['status_id'] == '2') {
+            return;
+        }
+
+        $db->exec("UPDATE ticket SET status_id = 2 WHERE id = $ticketId");
     }
 
     protected static function comment($ticketId, $comment, $userId, $userType)
