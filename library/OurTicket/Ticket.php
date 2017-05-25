@@ -75,4 +75,25 @@ class OurTicket_Ticket
         }
         self::comment($ticketId, $comment, $customerServiceId, 2);
     }
+    
+    public static function close($ticketId, $customerId)
+    {
+        $ticketId = OurTicket_Util::DBAIPK($ticketId);
+        if (!$ticketId) {
+            throw new InvalidArgumentException('invalid ticketId');
+        }
+
+        $sql = "SELECT id, status_id FROM ticket WHERE id = $ticketId AND customer_id = $customerId";
+        $db  = Zend_Db_Table_Abstract::getDefaultAdapter();
+        $row = $db->fetchRow($sql);
+        if (!$row) {
+            throw new InvalidArgumentException('ticketId not exists or not your ticket');
+        }
+        
+        // 1-pending 2-close
+        if ($row['status_id'] == '2') {
+            return;
+        }
+        $db->update('ticket', array('status_id'=>2), "id = $ticketId");
+    }
 }
