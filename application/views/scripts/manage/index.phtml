@@ -1,0 +1,23 @@
+ <table width="100%">
+    <tr>
+        <th>title</th>
+        <th>domain</th>
+        <th>customer</th>
+        <th>time</th>
+        <th>status</th>
+    </tr>
+    <?php foreach ($this->rows as $row): ?>
+        <tr>
+            <td>
+                <a href="/comment/index?id=<?php echo $row['id']; ?>">
+                    <?php echo $this->escape($row['title']); ?>
+                </a>
+            </td>
+            <td><?php echo $this->escape($row['domain']); ?></td>
+            <td><?php echo $this->escape($row['customer']); ?></td>
+            <td><?php echo $row['time']; ?></td>
+            <td><?php echo $row['status']; ?></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+
