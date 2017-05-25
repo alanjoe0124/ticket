@@ -44,4 +44,35 @@ class OurTicket_Ticket
             throw $e;
         }
     }
+    
+    protected static function comment($ticketId, $comment, $userId, $userType)
+    {
+        $len = mb_strlen($comment, 'UTF-8');
+        if ($len == 0 || $len > 3000) {
+            throw new InvalidArgumentException();
+        }
+ 
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+        $db->insert('comment', array(
+            'ticket_id' =>  $ticketId, 
+            'content'   =>  $comment, 
+            'user_id'   =>  $userId, 
+            'user_type' =>  $userType));
+    }
+
+    // 调用此方法前要保证ticketId是数字，并且是customerId的ticket
+    public static function customerAddComment($ticketId, $comment, $customerId)
+    {
+        self::comment($ticketId, $comment, $customerId, 1);
+    }
+
+    // 调用此方法前要保证ticketId是数字
+    public static function customerServiceAddComment($ticketId, $comment, $customerServiceId)
+    {
+        $sql = "SELECT id FROM ticket WHERE id = $ticketId";
+        if (!Zend_Db_Table_Abstract::getDefaultAdapter()->fetchOne($sql)) {
+            throw new InvalidArgumentException('no such ticketId');
+        }
+        self::comment($ticketId, $comment, $customerServiceId, 2);
+    }
 }
