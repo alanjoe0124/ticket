@@ -1,0 +1,15 @@
+<form method="post" class="login-form">
+    <?php
+    $session = new Zend_Session_Namespace();
+    if ($session->nameOrPwdWrong) {
+        echo '<p style="color:red;padding-left:50px;">用户名或密码不对</p>';
+    }
+    ?>
+    <div class="row">
+        user name: <input type="text" name="name">
+    </div>
+    <div class="row">
+        password: <input type="password" name="pwd">
+    </div>
+    <button type="submit">submit</button>
+</form>

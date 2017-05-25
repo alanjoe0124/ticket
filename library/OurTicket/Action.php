@@ -7,4 +7,8 @@ class OurTicket_Action extends Zend_Controller_Action
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
     }
+    
+    public function setLayout($name){
+        $this->_helper->layout->setLayout($name);
+    }
 }
