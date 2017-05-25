@@ -6,7 +6,20 @@
         <th>time</th>
         <th>status</th>
     </tr>
-    <?php foreach ($this->rows as $row): ?>
+    <?php 
+    $sql = 'SELECT  ticket.id AS id,
+                    ticket.title,
+                    ticket.domain,
+                    ticket.time,
+                    status.name AS status,
+                    customer.email as customer
+            FROM    ticket
+                    INNER JOIN status ON ticket.status_id = status.id
+                    INNER JOIN customer ON ticket.customer_id = customer.id
+                    ORDER BY ticket.time DESC, ticket.id DESC'; // 1-pending 2-close
+    $rows = Zend_Db_Table_Abstract::getDefaultAdapter()->fetchAll($sql);
+    ?>
+    <?php foreach ($rows as $row): ?>
         <tr>
             <td>
                 <a href="/comment/index?id=<?php echo $row['id']; ?>">
