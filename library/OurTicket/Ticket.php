@@ -28,7 +28,7 @@ class OurTicket_Ticket
 
         $db->beginTransaction();
         try {
-            if (!$customerId) {        
+            if (!$customerId) {
                 $db->insert('customer', array('email'=>$data['email']));
                 $customerId = $db->lastInsertId();
             }
@@ -44,14 +44,14 @@ class OurTicket_Ticket
             throw $e;
         }
     }
-    
+
     protected static function comment($ticketId, $comment, $userId, $userType)
     {
         $len = mb_strlen($comment, 'UTF-8');
         if ($len == 0 || $len > 3000) {
             throw new InvalidArgumentException();
         }
- 
+
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $db->insert('comment', array(
             'ticket_id' =>  $ticketId, 
@@ -75,7 +75,7 @@ class OurTicket_Ticket
         }
         self::comment($ticketId, $comment, $customerServiceId, 2);
     }
-    
+
     public static function close($ticketId, $customerId)
     {
         $ticketId = OurTicket_Util::DBAIPK($ticketId);
@@ -89,7 +89,7 @@ class OurTicket_Ticket
         if (!$row) {
             throw new InvalidArgumentException('ticketId not exists or not your ticket');
         }
-        
+
         // 1-pending 2-close
         if ($row['status_id'] == '2') {
             return;
