@@ -1,36 +1,37 @@
 <?php
 
-class LoginController extends OurTicket_Action
+class LoginController extends OurTicket_Controller_Action
 {
-
     public function indexAction()
     {
         $session = new Zend_Session_Namespace();
         if (isset($session->customerServiceId)) {
-            $this->redirect('/manage/index');
+            $this->redirect('/manage');
             exit;
         }
-        $session->nameOrPwdWrong = false;
-        
+
+        $this->view->nameOrPwdWrong = false;
+
         if ($_POST) {
             try {
                 OurTicket_Util::killCSRF();
-                $userRow = OurTicket_Login::doLogin($_POST);
+                $auth = Zend_Auth::getInstance();
+                $adapter = new OurTicket_Login($this->getPost('name'), $this->getPost('pwd'));
+                $result = $auth->authenticate($adapter);
             } catch (InvalidArgumentException $e) {
-                exit('invalid params');
+                exit($e->getMessage());
             }
 
-            if ($userRow) {
+            if ($result->isValid()) {
                 Zend_Session::regenerateId();
-                $session->customerServiceId = $userRow['id'];
-                $session->customerServiceName = $userRow['name'];
+                $session->customerServiceId = $result->getIdentity();
+                $session->customerServiceName = $adapter->getUserName();
                 $this->redirect('/manage/index');
                 exit;
             }
 
-            $session->nameOrPwdWrong = true;
+            $this->view->nameOrPwdWrong = true;
         }
         $this->setLayout('login_layout');
     }
-
 }

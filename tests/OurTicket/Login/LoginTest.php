@@ -17,20 +17,20 @@ class LoginTest extends Ticket_Database_TestCase
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage missing required key name
+     * @expectedExceptionMessage missing required userName
      */
     public function testNameIsRequired() 
     {
-        OurTicket_Login::doLogin(array('pwd' => '123456'));
+        $login = new OurTicket_Login(NULL, '123456');
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage missing required key pwd
+     * @expectedExceptionMessage missing required password
      */
     public function testPwdIsRequired()
     {
-        OurTicket_Login::doLogin(array('name' => 'cs_user_1'));
+        $login = new OurTicket_Login('cs_user_1', NULL);
     }
 
     /**
@@ -39,10 +39,7 @@ class LoginTest extends Ticket_Database_TestCase
      */
     public function testNameCannotEmpty()
     {
-        OurTicket_Login::doLogin(array(
-            'name' => '',
-            'pwd'  => '123456'
-        ));
+        $login = new OurTicket_Login('', '123456');
     }
 
     /**
@@ -51,10 +48,7 @@ class LoginTest extends Ticket_Database_TestCase
      */
     public function testNameMaxlengthIs100()
     {
-        OurTicket_Login::doLogin(array(
-            'name' => str_pad('cs_user_1', 101, 'A'),
-            'pwd'  => '123456'
-        ));
+        $login = new OurTicket_Login(str_pad('cs_user_1', 101, 'A'), '123456');
     }
 
     /**
@@ -63,10 +57,7 @@ class LoginTest extends Ticket_Database_TestCase
      */
     public function testPwdMinLengthIs5()
     {
-        OurTicket_Login::doLogin(array(
-            'name' => 'cs_user_1',
-            'pwd'  => '1234'
-        ));
+        $login = new OurTicket_Login('cs_user_1', '1234');
     }
 
     /**
@@ -75,42 +66,36 @@ class LoginTest extends Ticket_Database_TestCase
      */
     public function testPwdMaxLengthIs40()
     {
-        OurTicket_Login::doLogin(array(
-            'name' => 'cs_user_1',
-            'pwd'  => str_pad('123456', 41, 'A')
-        ));
+        $login = new OurTicket_Login('cs_user_1', str_pad('123456', 41, 'A'));
     }
 
     public function testLoginWithWrongName()
     {
-        $row = OurTicket_Login::doLogin(array(
-            'name' => 'cs_user_2',
-            'pwd'  => '123456'
-        ));
-        $this->assertEquals(false, $row);
+        $login = new OurTicket_Login('cs_user_2','123456');
+        $auth = Zend_Auth::getInstance();
+        $result = $auth->authenticate($login);
+        $this->assertFalse($result->isValid());
     }
 
-    public function testLoginWithWrongPwd() 
+    public function testLoginWithWrongPwd()
     {
-        $row = OurTicket_Login::doLogin(array(
-            'name' => 'cs_user_1',
-            'pwd'  => '1234567'
-        ));
-        $this->assertEquals(false, $row);
+        $login = new OurTicket_Login('cs_user_1','1234567');
+        $auth = Zend_Auth::getInstance();
+        $result = $auth->authenticate($login);
+        $this->assertFalse($result->isValid());
     }
 
     public function testLogin()
     {
-        $row = OurTicket_Login::doLogin(array(
-            'name' => 'cs_user_1',
-            'pwd'  => '123456'
-        ));
+        $login = new OurTicket_Login('cs_user_1','123456');
+        $auth = Zend_Auth::getInstance();
+        $result = $auth->authenticate($login);
+        $this->assertTrue($result->isValid());
+    }
 
-        $expected = array(
-            'id'   => 1, 
-            'name' => 'cs_user_1'
-        );
-
-        $this->assertEquals($expected, $row);
+    public function testGetUserName()
+    {
+        $login = new OurTicket_Login('cs_user_1','123456');
+        $this->assertEquals('cs_user_1',$login->getUserName());
     }
 }
