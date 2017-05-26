@@ -4,19 +4,35 @@
         exit('this header need customerEmail');
     }
 ?>
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="/common/css/main.css">
+<link rel="stylesheet" href="/common/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="headbox">
-            <h1>Ticket</h1>
-            <p>customer: <?php echo $this->escape($session->customerEmail); ?></p>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-8 column col-md-offset-2" style="height: 500px">
+
+            <div class="headbox">
+                <h1>Ticket</h1>
+                <label>customer: <?php echo $this->escape($session->customerEmail); ?></label>
+            </div>
+            <?php echo $this->layout()->content; ?>
         </div>
-        <?php echo $this->layout()->content; ?>
+        <div class="col-md-8 column col-md-offset-2">
+            <?php echo $this->paginator; ?>
+        </div>
     </div>
+</div>
+
+<script src="/common/js/jquery-3.2.1.min.js"></script>
+<script src="/common/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
+

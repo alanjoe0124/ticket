@@ -1,0 +1,104 @@
+<?php
+$request = new Zend_Controller_Request_Http();
+$params = $request->getParams();
+if ($params != NULL) {
+    $str = '';
+    $n = 0;
+    foreach ($params as $key => $val) {
+        if ($key != 'page') {
+            if ($n > 0) {
+                $str .= '&';
+            }
+            $str .= $key . '=' . $val;
+            $n++;
+        }
+    }
+}
+?>
+<nav aria-label="...">
+    <ul class="pager">
+        <?php if (isset($str)): ?>
+            <?php if ($this->pageCount): ?>
+                <!-- First page link -->
+                <?php if (isset($this->previous)): ?>
+
+                    <li><a href="<?php echo "?page=" . $this->first . ($str ? '&' . $str : ''); ?>">
+                            First
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">First</span></li> |
+                <?php endif; ?>
+
+                <!-- Previous page link -->
+                <?php if (isset($this->previous)): ?>
+                    <li><a href="<?php echo "?page=" . $this->previous . ($str ? '&' . $str : ''); ?>">
+                            &lt; Previous
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">&lt; Previous</span></li> |
+                <?php endif; ?>
+
+                <!-- Next page link -->
+                <?php if (isset($this->next)): ?>
+                    <li><a href="<?php echo "?page=" . $this->next . ($str ? '&' . $str : ''); ?>">
+                            Next &gt;
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">Next &gt;</span></li> |
+                <?php endif; ?>
+
+
+                <!-- Last page link -->
+                <?php if (isset($this->next)): ?>
+                    <li><a href="<?php echo "?page=" . $this->last . ($str ? '&' . $str : ''); ?>">
+                            Last
+                        </a></li>
+                <?php else: ?>
+                    <li><span class="disabled">Last</span></li>
+                <?php endif; ?>
+
+            <?php endif; ?>
+        <?php else: ?>
+            <?php if ($this->pageCount): ?>
+                <!-- First page link -->
+                <?php if (isset($this->previous)): ?>
+
+                    <li><a href="<?php echo $this->url(array('page' => $this->first)); ?>">
+                            First
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">First</span></li> |
+                <?php endif; ?>
+
+                <!-- Previous page link -->
+                <?php if (isset($this->previous)): ?>
+                    <li><a href="<?php echo $this->url(array('page' => $this->previous)); ?>">
+                            &lt; Previous
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">&lt; Previous</span></li> |
+                <?php endif; ?>
+
+                <!-- Next page link -->
+                <?php if (isset($this->next)): ?>
+                    <li><a href="<?php echo $this->url(array('page' => $this->next)); ?>">
+                            Next &gt;
+                        </a></li> |
+                <?php else: ?>
+                    <li><span class="disabled">Next &gt;</span></li> |
+                <?php endif; ?>
+
+                <!-- Last page link -->
+                <?php if (isset($this->next)): ?>
+                    <li><a href="<?php echo $this->url(array('page' => $this->last)); ?>">
+                            Last
+                        </a></li>
+                <?php else: ?>
+                    <li><span class="disabled">Last</span></li>
+                    <?php endif; ?>
+
+            <?php endif; ?>
+
+        <?php endif; ?>
+    </ul>
+</nav>
