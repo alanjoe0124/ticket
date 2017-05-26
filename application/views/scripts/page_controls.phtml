@@ -63,7 +63,7 @@ if ($params != NULL) {
                 <!-- First page link -->
                 <?php if (isset($this->previous)): ?>
 
-                    <li><a href="<?php echo $this->url(array('page' => $this->first)); ?>">
+                    <li><a href="<?php echo "?page=" . $this->first;?>">
                             First
                         </a></li> |
                 <?php else: ?>
@@ -72,7 +72,7 @@ if ($params != NULL) {
 
                 <!-- Previous page link -->
                 <?php if (isset($this->previous)): ?>
-                    <li><a href="<?php echo $this->url(array('page' => $this->previous)); ?>">
+                    <li><a href="<?php echo "?page=". $this->previous;?>">
                             &lt; Previous
                         </a></li> |
                 <?php else: ?>
@@ -81,7 +81,7 @@ if ($params != NULL) {
 
                 <!-- Next page link -->
                 <?php if (isset($this->next)): ?>
-                    <li><a href="<?php echo $this->url(array('page' => $this->next)); ?>">
+                    <li><a href="<?php echo "?page=". $this->next;?>">
                             Next &gt;
                         </a></li> |
                 <?php else: ?>
@@ -90,7 +90,7 @@ if ($params != NULL) {
 
                 <!-- Last page link -->
                 <?php if (isset($this->next)): ?>
-                    <li><a href="<?php echo $this->url(array('page' => $this->last)); ?>">
+                    <li><a href="<?php echo "?page=". $this->last;?>">
                             Last
                         </a></li>
                 <?php else: ?>

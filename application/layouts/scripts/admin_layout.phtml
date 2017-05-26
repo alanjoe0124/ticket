@@ -1,23 +1,39 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="/common/css/main.css">
+<link rel="stylesheet" href="/common/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
+
 <body>
-    <div class="container">
-        <div class="headbox">
-            <h1>Ticket</h1>
-            <p>
-                user: 
-                    <?php 
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-8 column col-md-offset-2" style="height: 500px">
+
+            <div class="headbox">
+                <h1>Ticket</h1>
+                <p>
+                    user: 
+                    <?php
                         $session = new Zend_Session_Namespace();
-                        echo $this->escape($session->customerServiceName); 
+                        echo $this->escape($session->customerServiceName);
                     ?>
-                /
-                <a href="/logout/index">logout</a>
-            </p>
+                    /
+                    <a href="/manage/logout">logout</a>
+                </p>
+            </div>
+            <?php echo $this->layout()->content; ?>
         </div>
-        <?php echo $this->layout()->content; ?>
+        <div class="col-md-8 column col-md-offset-2">
+            <?php echo $this->paginator; ?>
+        </div>
     </div>
+</div>
+
+<script src="/common/js/jquery-3.2.1.min.js"></script>
+<script src="/common/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
