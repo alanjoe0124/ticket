@@ -4,7 +4,7 @@
             $this->escape($ticketRow['title']), 
          '</h4>';
     if ($ticketRow['status_id'] == 1) { // 1-pending, 2-close
-        echo '<a href="/close/index?id=', $ticketRow['id'], '">Close</a>';
+        echo '<a href="/customer-comment/close?id=', $ticketRow['id'], '">Close</a>';
     } else {
         echo '<span>已解决</span>';
     }

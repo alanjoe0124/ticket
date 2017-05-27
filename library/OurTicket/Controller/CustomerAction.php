@@ -27,4 +27,21 @@ class OurTicket_Controller_CustomerAction extends OurTicket_Controller_Action
     {
         $this->session->customerEmail = $customerEmail;
     }
+
+    public function closeAction()
+    {
+        if(!isset($this->session->customerId)){
+            exit;
+        }
+        try {
+            OurTicket_Util::killCSRF();
+            $ticketId = $this->getQuery('id');
+            OurTicket_Ticket::close($ticketId, $this->session->customerId);
+        } catch (InvalidArgumentException $e) {
+            die('invalid params');
+        } catch (Exception $e) {
+            die('server error');
+        }
+        $this->redirect("/customer-comment/index?id=$ticketId");
+    }
 }
