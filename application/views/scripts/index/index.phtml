@@ -3,7 +3,7 @@
 foreach ($this->paginator as $row) {
     ?>
     <div class="row">
-        <a href="/comment/index?id=<?php echo $row['id']; ?>">
+        <a href="/customer-comment/index?id=<?php echo $row['id']; ?>">
             <?php echo $this->escape($row['title']); ?>
         </a>
         <span class="status"><?php echo $row['status']; ?></span>
