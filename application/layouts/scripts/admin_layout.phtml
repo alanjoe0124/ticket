@@ -18,8 +18,7 @@
                 <p>
                     user: 
                     <?php
-                        $session = new Zend_Session_Namespace();
-                        echo $this->escape($session->customerServiceName);
+                        echo $this->escape($this->customerService['name']);
                     ?>
                     /
                     <a href="/manage/logout">logout</a>
