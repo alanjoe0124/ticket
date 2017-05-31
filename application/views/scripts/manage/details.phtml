@@ -1,0 +1,24 @@
+<?php
+    echo '<h4 style="margin: 0 20px 5px 0;display:inline-block;">', 
+            $this->escape($this->ticketDetails['title']), 
+         '</h4>';
+    if ($this->ticketDetails['status_id'] == 1) { // 1-pending, 2-close
+        echo '待解决';
+    } else {
+        echo '已解决';
+    }
+?>
+<pre><?php echo $this->escape($this->ticketDetails['description']); ?></pre>
+<div>
+    <small>Customer: <?php echo $this->escape($this->ticketDetails['customer']); ?> /</small>
+    <small>Domain: <?php echo $this->escape($this->ticketDetails['domain']); ?> /</small>
+    <small><?php echo $this->ticketDetails['time']; ?></small>
+</div>
+
+<?php
+    $this->customerEmail = $this->ticketDetails['customer'];
+    echo $this->render('/index/ticket-comments.phtml');
+    
+    $this->commentFormAction = '/manage/add-comment';
+    echo $this->render('/index/comment-form.phtml');
+?>

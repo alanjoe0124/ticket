@@ -1,0 +1,7 @@
+<h3>Add Comment:</h3>
+<form method="POST" action="<?php echo $this->commentFormAction; ?>">
+    <input type="hidden" name="ticketId" value="<?php echo $this->ticketDetails['id']; ?>">
+    <textarea name="comment" rows="10" cols="80" placeholder="comment here..."></textarea>
+    <br>
+    <button type="submit">submit</button>
+</form>

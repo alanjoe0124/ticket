@@ -11,49 +11,8 @@
 <pre><?php echo $this->escape($this->ticketDetails['description']); ?></pre>
 <small><?php echo $this->ticketDetails['time']; ?></small>
 
-<h3>Comments:</h3>
-<?php
-    $sql = 'SELECT  content,
-                    user_id,
-                    user_type,
-                    time
-            FROM    comment
-            WHERE
-                    ticket_id = ' . $this->ticketDetails['id'] . '
-                    ORDER BY id ASC';
-    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-    $commentRows = $db->fetchAll($sql);
-    $customerServiceIds = array();
-    foreach ($commentRows as $row) {
-        if ($row['user_type'] == 2) { // 1-customer, 2-customer service
-            $customerServiceIds[] = $row['user_id'];
-        }
-    }
-    $customerServiceNames = array();
-    if ($customerServiceIds) {
-        $rows = $db->fetchAll('SELECT id, name FROM user WHERE id IN (' . implode(',', $customerServiceIds) . ')');
-        foreach ($rows as $row) {
-            $customerServiceNames[$row['id']] = $this->escape($row['name']);
-        }
-    }
-
-    foreach ($commentRows as $row) {
-        echo '<div class="row">';
-        if ($row['user_type'] == 1) {
-            echo '我';
-        } else {
-            echo $customerServiceNames[$row['user_id']];
-        }
-        echo '<pre>', $this->escape($row['content']), '</pre>';
-        echo '<small>', $row['time'], '</small>';
-        echo '</div>';
-    }
+<?php 
+    echo $this->render('/index/ticket-comments.phtml'); 
+    $this->commentFormAction = '/index/add-comment';
+    echo $this->render('/index/comment-form.phtml');
 ?>
-
-<h3>Add Comment:</h3>
-<form method="POST" action="/index/add-comment">
-    <input type="hidden" name="ticketId" value="<?php echo $this->ticketDetails['id']; ?>">
-    <textarea name="comment" rows="10" cols="80" placeholder="comment here..."></textarea>
-    <br>
-    <button type="submit">submit</button>
-</form>

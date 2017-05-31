@@ -1,37 +1,14 @@
-<?php
-$ticketId = $this->ticketId;
-if (!$ticketId) {
-    $this->redirect('/manage/index');
-    exit;
-}
-
-$db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-$sql = "SELECT  ticket.*,
-                    customer.email AS customer,
-                    status.name AS status
-            FROM    ticket
-                    INNER JOIN customer ON ticket.customer_id = customer.id
-                    INNER JOIN status ON ticket.status_id = status.id
-            WHERE
-                    ticket.id = $ticketId";
-$ticketRow = $db->fetchRow($sql);
-
- 
-echo $this->partial('customer-service-comment/admin_ticket_info.phtml', array('ticketRow' => $ticketRow));
- 
-?>
-
 <h3>Comments:</h3>
 <?php
-    $sql = "SELECT  content,
+    $sql = 'SELECT  content,
                     user_id,
                     user_type,
                     time
             FROM    comment
             WHERE
-                    ticket_id = $ticketId 
-                    ORDER BY id ASC";
+                    ticket_id = ' . $this->ticketDetails['id'] . '
+                    ORDER BY id ASC';
+    $db = Zend_Db_Table_Abstract::getDefaultAdapter();
     $commentRows = $db->fetchAll($sql);
     $customerServiceIds = array();
     foreach ($commentRows as $row) {
@@ -50,7 +27,11 @@ echo $this->partial('customer-service-comment/admin_ticket_info.phtml', array('t
     foreach ($commentRows as $row) {
         echo '<div class="row">';
         if ($row['user_type'] == 1) {
-           echo $this->escape($ticketRow['customer']);
+            if ($this->customerEmail) {
+                echo $this->customerEmail;
+            } else {
+                echo '我';
+            }
         } else {
             echo $customerServiceNames[$row['user_id']];
         }
@@ -59,12 +40,3 @@ echo $this->partial('customer-service-comment/admin_ticket_info.phtml', array('t
         echo '</div>';
     }
 ?>
-
-<h3>Add Comment:</h3>
-<form method="POST">
-    <textarea name="comment" rows="10" cols="80" placeholder="comment here..."></textarea>
-    <br>
-    <button type="submit">submit</button>
-</form>
-
-

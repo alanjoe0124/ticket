@@ -6,7 +6,8 @@ class OurTicket_Login implements Zend_Auth_Adapter_Interface
     protected $userName;
     protected $password;
 
-    public function __construct($userName, $pwd) {
+    public function __construct($userName, $pwd) 
+    {
         if (!isset($userName)) {
             throw new InvalidArgumentException('missing required userName');
         }
@@ -25,19 +26,23 @@ class OurTicket_Login implements Zend_Auth_Adapter_Interface
         }
     }
 
-    public function authenticate() {
+    public function authenticate() 
+    {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
         $sql = 'SELECT id FROM user WHERE name = ? and pwd = ?';
-        $uid = $db->fetchOne($sql, array($this->userName, md5($this->password . self::SALT))
+        $uid = $db->fetchOne(
+            $sql, 
+            array(
+                $this->userName, 
+                md5($this->password . self::SALT)
+            )
         );
         if ($uid) {
-            return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $uid);
+            return new Zend_Auth_Result(
+                Zend_Auth_Result::SUCCESS, 
+                array('id' => $uid, 'name' => $this->userName)
+            );
         }
         return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, 0);
-    }
-
-    public function getUserName()
-    {
-        return $this->userName;
     }
 }

@@ -1,8 +1,8 @@
-<form method="post">
+<form method="post" action="/login/do-login">
     <?php
-    if ($this->nameOrPwdWrong) {
-        echo '<p style="color:red;padding-left:50px;">用户名或密码不对</p>';
-    }
+        if ($this->nameOrPwdWrong) {
+            echo '<p style="color:red;padding-left:50px;">用户名或密码不对</p>';
+        }
     ?>
     <div class="form-group col-md-8 column col-md-offset-2">
         <label for="name">user name:</label>
@@ -13,6 +13,6 @@
         <input type="password" class="form-control" name="pwd">
     </div>
     <div class="form-group col-md-8 column col-md-offset-2">
-    <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-default">Submit</button>
     </div>
 </form>

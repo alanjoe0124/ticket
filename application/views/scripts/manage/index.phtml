@@ -1,4 +1,4 @@
- <table width="100%">
+<table width="100%">
     <tr>
         <th>title</th>
         <th>domain</th>
@@ -9,7 +9,7 @@
     <?php foreach ($this->paginator as $row): ?>
         <tr>
             <td>
-                <a href="/customer-service-comment/index?id=<?php echo $row['id']; ?>">
+                <a href="/manage/details?id=<?php echo $row['id']; ?>">
                     <?php echo $this->escape($row['title']); ?>
                 </a>
             </td>
@@ -20,4 +20,3 @@
         </tr>
     <?php endforeach; ?>
 </table>
-
