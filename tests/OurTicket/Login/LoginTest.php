@@ -92,10 +92,4 @@ class LoginTest extends Ticket_Database_TestCase
         $result = $auth->authenticate($login);
         $this->assertTrue($result->isValid());
     }
-
-    public function testGetUserName()
-    {
-        $login = new OurTicket_Login('cs_user_1','123456');
-        $this->assertEquals('cs_user_1',$login->getUserName());
-    }
 }
