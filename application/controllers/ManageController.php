@@ -61,4 +61,11 @@ class ManageController extends OurTicket_Controller_CustomerServiceAction
 
         $this->redirect('/manage/details?id=' . $ticketId);
     }
+
+    public function logoutAction()
+    {
+        Zend_Session::destroy();
+        $this->redirect('/login');
+    }
+
 }
