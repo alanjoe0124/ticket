@@ -1,12 +1,13 @@
-
-<?php
-foreach ($this->paginator as $row) {
-    ?>
+<?php foreach ($this->paginator as $row): ?>
     <div class="row">
-        <a href="/customer-comment/index?id=<?php echo $row['id']; ?>">
+        <a href="/index/details?id=<?php echo $row['id']; ?>">
             <?php echo $this->escape($row['title']); ?>
         </a>
         <span class="status"><?php echo $row['status']; ?></span>
     </div>
-<?php } ?>
+<?php endforeach; ?>
+
+<div class="col-md-8 column col-md-offset-2">
+    <?php echo $this->paginator; ?>
+</div>
 

@@ -47,9 +47,23 @@ class OurTicket_Ticket
 
     protected static function comment($ticketId, $comment, $userId, $userType)
     {
+        $ticketId = OurTicket_Util::DBAIPK($ticketId);
+        if (!$ticketId) {
+            throw new InvalidArgumentException('invalid ticketId');
+        }
+
         $len = mb_strlen($comment, 'UTF-8');
         if ($len == 0 || $len > 3000) {
             throw new InvalidArgumentException();
+        }
+        
+        $sql = "SELECT id, customer_id FROM ticket WHERE id = $ticketId";
+        $ticketRow = Zend_Db_Table_Abstract::getDefaultAdapter()->fetchRow($sql);
+        if (!$ticketRow) {
+            throw new InvalidArgumentException('no such ticketId');
+        }
+        if ($userType == 1 && $ticketRow['customer_id'] != $userId) {
+            throw new InvalidArgumentException('not your ticket');
         }
 
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
@@ -57,22 +71,17 @@ class OurTicket_Ticket
             'ticket_id' =>  $ticketId, 
             'content'   =>  $comment, 
             'user_id'   =>  $userId, 
-            'user_type' =>  $userType));
+            'user_type' =>  $userType
+        ));
     }
 
-    // 调用此方法前要保证ticketId是数字，并且是customerId的ticket
     public static function customerAddComment($ticketId, $comment, $customerId)
     {
         self::comment($ticketId, $comment, $customerId, 1);
     }
 
-    // 调用此方法前要保证ticketId是数字
     public static function customerServiceAddComment($ticketId, $comment, $customerServiceId)
     {
-        $sql = "SELECT id FROM ticket WHERE id = $ticketId";
-        if (!Zend_Db_Table_Abstract::getDefaultAdapter()->fetchOne($sql)) {
-            throw new InvalidArgumentException('no such ticketId');
-        }
         self::comment($ticketId, $comment, $customerServiceId, 2);
     }
 

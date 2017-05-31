@@ -1,9 +1,4 @@
-<?php
-    $session = new Zend_Session_Namespace();
-    if (!isset($session->customerEmail)) {
-        exit('this header need customerEmail');
-    }
-?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,12 +16,9 @@
 
             <div class="headbox">
                 <h1>Ticket</h1>
-                <label>customer: <?php echo $this->escape($session->customerEmail); ?></label>
+                <label>customer: <?php echo $this->escape($this->customer['email']); ?></label>
             </div>
             <?php echo $this->layout()->content; ?>
-        </div>
-        <div class="col-md-8 column col-md-offset-2">
-            <?php echo $this->paginator; ?>
         </div>
     </div>
 </div>
@@ -35,4 +27,3 @@
 <script src="/common/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
-
