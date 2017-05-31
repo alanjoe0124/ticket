@@ -7,7 +7,7 @@ class TicketController extends OurTicket_Controller_Action
         $this->disableLayoutAndView();
         try {
             $ticket = new OurTicket_Ticket();
-            $ticket->create($this->getPost());
+            $ticket->create($_POST);
             $res = 'success';
         } catch (InvalidArgumentException $e) {
             $res = $e->getMessage();
