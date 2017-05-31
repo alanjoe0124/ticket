@@ -16,6 +16,15 @@ class Ticket_CommentTest extends Ticket_Database_TestCase
                     'domain'      => 'ourblog.dev',
                     'status_id'   => 1,
                     'time'        => '2017-05-24 16:00:00'
+                ),
+                array(
+                    'id'          => 2,
+                    'title'       => 'how to reply blog?',
+                    'description' => 'RT. how to reply blog?',
+                    'customer_id' => 2,
+                    'domain'      => 'ourblog.dev',
+                    'status_id'   => 1,
+                    'time'        => '2017-05-24 16:00:00'
                 )
             ),
             'comment' => array()
@@ -28,7 +37,25 @@ class Ticket_CommentTest extends Ticket_Database_TestCase
      */
     public function testTicketIdShouldExist()
     {
-        OurTicket_Ticket::customerServiceAddComment(2, 'comment bla bla bla ...', 1);
+        OurTicket_Ticket::customerAddComment(4, 'comment bla bla bla ...', 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage invalid ticketId
+     */
+    public function testTicketIdShouldValid()
+    {
+        OurTicket_Ticket::customerServiceAddComment('abc', 'comment bla bla bla ...', 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage not your ticket
+     */
+    public function testTicketNotBelongToOperator()
+    {
+        OurTicket_Ticket::customerAddComment( 2, 'comment bla bla bla ...', 1);
     }
 
     /**
