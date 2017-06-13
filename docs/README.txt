@@ -1,30 +1,15 @@
-README
-======
+工单(ticket)系统的使用者有两类:
 
-This directory should be used to place project specfic documentation including
-but not limited to project notes, generated API/phpdoc documentation, or
-manual files generated or hand written.  Ideally, this directory would remain
-in your development environment only and should not be deployed with your
-application to it's final production location.
+1) OurBlog的正常用户(user), 他们是工单的提交者
+2) 客户服务顾问(customer_service, 以下简称cs),由他们来回答用户提交的问题.
 
+使用流程:
 
-Setting Up Your VHOST
-=====================
+1) userA在使用系统A时遇到了问题,提交了一个工单A1
+2) userB在使用系统B时遇到了问题,提交了一个工单B1
 
-The following is a sample VHOST you might want to consider for your project.
-
-<VirtualHost *:80>
-   DocumentRoot "/var/www/ticket/public"
-   ServerName ticket.local
-
-   # This should be omitted in the production environment
-   SetEnv APPLICATION_ENV development
-
-   <Directory "/var/www/ticket/public">
-       Options Indexes MultiViews FollowSymLinks
-       AllowOverride All
-       Order allow,deny
-       Allow from all
-   </Directory>
-
-</VirtualHost>
+3) csA,csB在工单系统里看到了工单A1,B1
+4) csA回复了工单A1, csB回复了工单B1
+5) userA看到csA的回复后,需要进一步的咨询,于是在工单A1上追加了评论.
+6) userB看到csB的回复后,问题清楚了. 于是将工单B1标记为已解决.
+7) csB看到userA的评论后,回复了userA.
